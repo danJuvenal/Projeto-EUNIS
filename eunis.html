@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EUNIS — Descreva, a gente ache!!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   EUNIS — tokens
+   Branco e rosa claro. Tom leve, nada saturado.
+   O rosa marca só o que é ação; o resto respira em branco.
+   ============================================================ */
+:root{
+  --bg:#FFFFFF;
+  --surface:#FFFAFB;
+  --surface-2:#FBF0F3;
+  --line:#F0E2E7;
+  --text:#2E2429;
+  --text-2:#8B7B82;
+  --accent:#B4657E;
+  --accent-soft:#FBEAF0;
+  --accent-line:#EFD5DE;
+  --onaccent:#FFFFFF;
+  --alerta:#B4515B;
+  --ok:#3E7F63;
+  --shadow:0 12px 34px rgba(90,60,72,.10);
+  --veu:.55;
+
+  --r-s:14px; --r-m:18px; --r-l:28px;
+  --sp:16px;
+  --ff-display:'Fraunces',Georgia,'Times New Roman',serif;
+  --ff-body:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --maxw:480px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1C1518; --surface:#241C1F; --surface-2:#2F2429; --line:#3B2D33;
+    --text:#F7EFF2; --text-2:#B4A2A9;
+    --accent:#E9A9BC; --accent-soft:#38262D; --accent-line:#4A343C; --onaccent:#2A181E;
+    --alerta:#E58A94; --ok:#78C9A5;
+    --shadow:0 18px 44px rgba(0,0,0,.45); --veu:.3;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1C1518; --surface:#241C1F; --surface-2:#2F2429; --line:#3B2D33;
+  --text:#F7EFF2; --text-2:#B4A2A9;
+  --accent:#E9A9BC; --accent-soft:#38262D; --accent-line:#4A343C; --onaccent:#2A181E;
+  --alerta:#E58A94; --ok:#78C9A5;
+  --shadow:0 18px 44px rgba(0,0,0,.45); --veu:.3;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{
+  height:100%;margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--ff-body);font-size:16px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none;padding:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+/* ---------- casca do app ---------- */
+#sala{min-height:100%;display:flex;align-items:stretch;justify-content:center}
+#app{
+  width:100%;max-width:var(--maxw);background:var(--bg);position:relative;
+  display:flex;flex-direction:column;min-height:100%;overflow:hidden;
+}
+@media (min-width:900px){
+  #sala{background:
+    radial-gradient(120% 70% at 50% -10%, color-mix(in srgb,var(--accent) 14%, transparent), transparent 60%),
+    var(--bg);
+    padding:28px 16px;}
+  #app{border:1px solid var(--line);border-radius:34px;box-shadow:var(--shadow);min-height:min(880px,calc(100vh - 56px));max-height:calc(100vh - 56px)}
+}
+#tela{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-bottom:96px}
+.wrap{padding:0 20px}
+
+/* ---------- tipografia ---------- */
+h1,h2,h3{font-family:var(--ff-display);font-weight:600;margin:0;letter-spacing:-.015em;line-height:1.1}
+h1{font-size:clamp(28px,8vw,36px)}
+h2{font-size:23px}
+h3{font-size:18px}
+.sub{color:var(--text-2);font-size:14.5px;margin:6px 0 0}
+.secao{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 12px}
+.secao h2{font-size:20px}
+.secao button{color:var(--accent);font-size:13.5px;font-weight:600}
+
+/* ---------- cabeçalho ---------- */
+.topo{display:flex;align-items:center;gap:12px;padding:18px 20px 6px}
+.topo .marca{font-family:var(--ff-display);font-weight:700;font-size:25px;letter-spacing:.14em;flex:1}
+.topo .marca em{font-style:normal;color:var(--accent)}
+.iconbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);font-size:16px}
+.voltar{display:inline-flex;align-items:center;gap:8px;color:var(--text-2);font-size:14px;font-weight:600;padding:16px 20px 4px}
+
+/* ---------- busca por intenção ---------- */
+.facho{
+  margin:0 20px;padding:20px;border-radius:var(--r-l);position:relative;
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+}
+.facho h2{font-size:21px}
+.facho p{margin:7px 0 14px;color:var(--text-2);font-size:14px;max-width:34ch}
+.buscaia{display:flex;gap:8px;align-items:flex-end;background:var(--bg);border:1px solid var(--accent-line);border-radius:var(--r-m);padding:8px 8px 8px 14px}
+.buscaia textarea{flex:1;border:none;background:none;resize:none;height:42px;font-size:15px;outline:none;padding:9px 0}
+.buscaia textarea::placeholder{color:var(--text-2)}
+.exemplo{margin-top:12px;font-size:13px;color:var(--text-2)}
+.exemplo button{color:var(--accent);font-weight:600;text-align:left}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:13px;color:var(--text-2)}
+.chip[aria-pressed="true"],.chip.on{background:var(--accent);color:var(--onaccent);border-color:var(--accent);font-weight:600}
+
+/* ---------- botões ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;border-radius:var(--r-m);font-weight:600;font-size:15px;width:100%;border:1px solid transparent}
+.btn-1{background:var(--accent);color:var(--onaccent)}
+.btn-2{background:var(--surface);border-color:var(--line);color:var(--text)}
+.btn-3{background:none;color:var(--text-2);font-weight:500}
+.btn-sm{padding:9px 14px;font-size:13.5px;width:auto;border-radius:999px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+
+/* ---------- cartazes ---------- */
+.cartaz{position:relative;aspect-ratio:2/3;border-radius:var(--r-s);overflow:hidden;display:grid;align-content:end;padding:10px;color:#fff;isolation:isolate;border:1px solid var(--line)}
+.cartaz::before{content:"";position:absolute;inset:0;z-index:-2;
+  background:linear-gradient(158deg,var(--c1),var(--c2));filter:saturate(.42) brightness(1.06)}
+.cartaz::after{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(180deg,rgba(255,255,255,var(--veu)) 0%,rgba(255,255,255,0) 46%),
+             linear-gradient(0deg,rgba(40,25,32,.78) 0%,rgba(40,25,32,0) 52%)}
+.cartaz .tit{font-family:var(--ff-display);font-weight:600;font-size:14px;line-height:1.14}
+.cartaz .meta{font-size:11px;opacity:.88;margin-top:3px}
+.cartaz .sel{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.86);color:#3A2A31;border-radius:999px;padding:3px 9px;font-size:11px;font-weight:700}
+.carrossel{display:grid;grid-auto-flow:column;grid-auto-columns:112px;gap:12px;overflow-x:auto;padding:2px 20px 6px;scrollbar-width:none;scroll-snap-type:x proximity}
+.carrossel::-webkit-scrollbar{display:none}
+.carrossel > *{scroll-snap-align:start}
+.grade{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grade.g2{grid-template-columns:repeat(2,1fr)}
+
+/* ---------- carrossel grande do "Em alta" ---------- */
+.palco{position:relative;margin-top:10px}
+.trilho{display:grid;grid-auto-flow:column;grid-auto-columns:82%;gap:14px;overflow-x:auto;
+  padding:4px 20px 10px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.trilho::-webkit-scrollbar{display:none}
+.destaque{scroll-snap-align:center;position:relative;border-radius:var(--r-l);overflow:hidden;
+  aspect-ratio:3/4;display:grid;align-content:end;padding:20px;color:#fff;isolation:isolate;
+  border:1px solid var(--line);box-shadow:var(--shadow);text-align:left}
+.destaque::before{content:"";position:absolute;inset:0;z-index:-2;
+  background:linear-gradient(162deg,var(--c1),var(--c2));filter:saturate(.45) brightness(1.04)}
+.destaque::after{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(180deg,rgba(255,255,255,var(--veu)) 0%,rgba(255,255,255,0) 40%),
+             linear-gradient(0deg,rgba(38,24,30,.86) 6%,rgba(38,24,30,.15) 58%,rgba(38,24,30,0) 100%)}
+.destaque .posicao{position:absolute;top:16px;left:16px;background:rgba(255,255,255,.9);color:#3A2A31;
+  border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;font-family:var(--ff-display)}
+.destaque h3{font-family:var(--ff-display);font-size:25px;line-height:1.06;margin-bottom:6px}
+.destaque .linhameta{font-size:13px;opacity:.92}
+.destaque .frase{font-size:13.5px;opacity:.92;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pontos{display:flex;gap:6px;justify-content:center;margin-top:12px}
+.pontos i{width:6px;height:6px;border-radius:50%;background:var(--line);transition:width .2s,background .2s}
+.pontos i.on{width:20px;background:var(--accent)}
+
+/* ---------- listas / cartões ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:16px}
+.card + .card{margin-top:12px}
+.linha{display:flex;gap:12px;align-items:center;width:100%;text-align:left}
+.linha .cartaz{width:56px;aspect-ratio:2/3;border-radius:6px;flex:none;padding:0}
+.linha .cartaz .tit{display:none}
+.linha .info{flex:1;min-width:0}
+.linha .info strong{display:block;font-size:15px;font-weight:600}
+.linha .info span{color:var(--text-2);font-size:13px}
+.vazio{text-align:center;padding:40px 24px;color:var(--text-2)}
+.vazio h3{color:var(--text);margin-bottom:8px}
+
+/* ---------- formulários ---------- */
+.campo{margin-bottom:14px}
+.campo label{display:block;font-size:13.5px;font-weight:600;margin-bottom:6px}
+.campo input,.campo textarea,.campo select{
+  width:100%;padding:14px;border-radius:var(--r-m);border:1px solid var(--line);
+  background:var(--surface);outline:none;font-size:15px}
+.campo input:focus,.campo textarea:focus{border-color:var(--accent)}
+.campo .ajuda{font-size:12.5px;color:var(--text-2);margin-top:6px}
+.erro{color:var(--alerta);font-size:13px;margin-top:6px;display:block}
+.forca{height:4px;border-radius:2px;background:var(--surface-2);margin-top:8px;overflow:hidden}
+.forca i{display:block;height:100%;width:0;background:var(--alerta);transition:width .25s}
+
+/* ---------- avaliação / estrelas ---------- */
+.estrelas{display:inline-flex;gap:3px;font-size:18px;color:var(--accent);letter-spacing:1px}
+.estrelas.input button{font-size:28px;color:var(--line)}
+.estrelas.input button.on{color:var(--accent)}
+.nota{font-family:var(--ff-display);font-weight:700;font-size:15px}
+
+/* ---------- comentários ---------- */
+.coment{display:flex;gap:11px;padding:14px 0;border-bottom:1px solid var(--line)}
+.av{width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;font-size:14px;color:#fff;font-family:var(--ff-display)}
+.coment .corpo{flex:1;min-width:0}
+.coment .quem{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.coment .quando{color:var(--text-2);font-weight:400;font-size:12px}
+.coment p{margin:5px 0 8px;font-size:14.5px}
+.selo{font-size:10.5px;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:2px 7px;border-radius:999px;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+
+/* ---------- navegação inferior ---------- */
+#nav{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);
+  background:color-mix(in srgb,var(--surface) 88%, transparent);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px))}
+#nav button{display:grid;justify-items:center;gap:3px;font-size:10.5px;color:var(--text-2);padding:4px 0}
+#nav button .ic{font-size:19px;line-height:1}
+#nav button.on{color:var(--accent);font-weight:700}
+
+/* ---------- folha (modal) ---------- */
+.folha-fundo{position:fixed;inset:0;background:rgba(10,7,18,.6);display:grid;align-items:end;justify-items:center;z-index:50}
+.folha{width:100%;max-width:var(--maxw);background:var(--bg);border-radius:var(--r-l) var(--r-l) 0 0;
+  padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));max-height:86vh;overflow-y:auto;
+  animation:sobe .22s ease-out}
+@keyframes sobe{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.folha .puxador{width:38px;height:4px;border-radius:2px;background:var(--line);margin:-8px auto 16px}
+
+/* ---------- avisos ---------- */
+#toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  background:var(--text);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:600;
+  z-index:80;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;max-width:88vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(-6px)}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:20px 0 4px}
+.tabs button{padding:11px 14px;font-size:14px;font-weight:600;color:var(--text-2);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--text);border-bottom-color:var(--accent)}
+
+.pensando{display:flex;align-items:center;gap:10px;color:var(--text-2);font-size:14px;padding:18px 0}
+.pensando i{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pisca 1s infinite}
+.pensando i:nth-child(2){animation-delay:.15s}.pensando i:nth-child(3){animation-delay:.3s}
+@keyframes pisca{0%,100%{opacity:.25}50%{opacity:1}}
+
+.fita{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--text-2);background:var(--surface-2);
+  border-radius:var(--r-s);padding:10px 12px;margin-top:14px}
+hr{border:none;border-top:1px solid var(--line);margin:20px 0}
+
+/* ---------- explorador de categorias ---------- */
+.cat{border-bottom:1px solid var(--line)}
+.cat > .cab{display:flex;align-items:center;gap:12px;width:100%;padding:16px 0;text-align:left}
+.cat > .cab strong{flex:1;font-size:15.5px;font-weight:600}
+.cat > .cab .conta{font-size:13px;color:var(--accent);font-weight:600}
+.cat > .cab .seta{color:var(--text-2);transition:transform .2s;font-size:13px}
+.cat.aberta > .cab .seta{transform:rotate(90deg)}
+.cat .corpo{display:none;padding:0 0 16px}
+.cat.aberta .corpo{display:block}
+.malha{display:flex;flex-wrap:wrap;gap:8px}
+.barra-res{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--bg) 26%);padding:14px 0 6px}
+.busca-simples{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);
+  border-radius:999px;padding:12px 18px}
+.busca-simples input{flex:1;border:none;background:none;outline:none;font-size:15px}
+.segment{display:flex;background:var(--surface-2);border-radius:999px;padding:3px;margin-top:12px}
+.segment button{flex:1;padding:9px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--text-2)}
+.segment button.on{background:var(--bg);color:var(--text);box-shadow:0 1px 4px rgba(90,60,72,.12)}
+.mini{font-size:12.5px;color:var(--text-2)}
+.switch{position:relative;width:46px;height:27px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);flex:none;transition:background .2s}
+.switch i{position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:var(--text-2);transition:transform .2s,background .2s}
+.switch.on{background:var(--accent);border-color:var(--accent)}
+.switch.on i{transform:translateX(19px);background:#fff}
+.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px 0;border-bottom:1px solid var(--line)}
+.opt .t{flex:1}.opt .t strong{display:block;font-size:15px;font-weight:600}
+.opt .t span{font-size:13px;color:var(--text-2)}
+</style>
+</head>
+<body>
+<div id="sala"><div id="app">
+  <div id="tela" role="main"></div>
+  <nav id="nav" hidden></nav>
+</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="folha"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   EUNIS — MVP navegável
+   Camadas: Banco (persistência) → Auth → Regras → Telas
+   ============================================================ */
+
+/* ---------- utilidades ---------- */
+const $ = s => document.querySelector(s);
+const el = (t,a={},...f)=>{const n=document.createElement(t);
+  for(const k in a){ if(k==="class")n.className=a[k]; else if(k==="html")n.innerHTML=a[k];
+    else if(k.startsWith("on"))n.addEventListener(k.slice(2),a[k]); else if(a[k]!==null&&a[k]!==false)n.setAttribute(k,a[k]); }
+  f.flat().forEach(c=>c!=null&&n.append(c.nodeType?c:document.createTextNode(c)));return n;};
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = p => p+"_"+Math.random().toString(36).slice(2,10);
+const agora = () => new Date().toISOString();
+function desde(iso){
+  const s=(Date.now()-new Date(iso))/1000;
+  if(s<60)return "agora"; if(s<3600)return Math.floor(s/60)+" min";
+  if(s<86400)return Math.floor(s/3600)+" h"; if(s<2592000)return Math.floor(s/86400)+" d";
+  return new Date(iso).toLocaleDateString("pt-BR");
+}
+let toastT;
+function avisar(msg){const t=$("#toast");t.textContent=msg;t.classList.add("on");
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),2600);}
+
+/* ---------- filtro de palavrões (RN: opcional, por usuário) ---------- */
+const PALAVROES=["merda","porra","caralho","buceta","foda","fodase","puta","putaquepariu","cuzao","babaca","viado","arrombado","desgraca","desgraça","bosta","crl","pqp","vtnc","otario","otário","imbecil","idiota","escroto"];
+function limparTexto(txt, ativo){
+  if(!ativo) return txt;
+  return txt.replace(/[\wÀ-ÿ]+/g, p => {
+    const n = p.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    return PALAVROES.some(x=>n===x.normalize("NFD").replace(/[\u0300-\u036f]/g,"")) ? p[0]+"•".repeat(Math.max(p.length-1,2)) : p;
+  });
+}
+
+/* ============================================================
+   1. BANCO DE DADOS  (modelagem do §15 do PRD)
+   ============================================================ */
+const Banco = {
+  CHAVE:"eunis.db.v1",
+  d:null,
+  iniciar(){
+    try{ const cru = localStorage.getItem(this.CHAVE); if(cru) this.d = JSON.parse(cru); }
+    catch(e){ this.d=null; }
+    if(!this.d || this.d.versao!==1){ this.d = this.semente(); this.salvar(); }
+    // tabelas que podem faltar em bancos antigos
+    ["usuarios","avaliacoes","comentarios","listas","itensLista","eventos"].forEach(t=>this.d[t]=this.d[t]||[]);
+  },
+  salvar(){ try{ localStorage.setItem(this.CHAVE, JSON.stringify(this.d)); }catch(e){ avisar("Não consegui salvar neste navegador."); } },
+  zerar(){ try{ localStorage.removeItem(this.CHAVE); }catch(e){} this.d=null; this.iniciar(); },
+
+  // consultas
+  usuarioPorEmail(email){ return this.d.usuarios.find(u=>u.email===email.trim().toLowerCase()); },
+  usuario(id){ return this.d.usuarios.find(u=>u.id===id); },
+  conteudo(id){ return this.d.catalogo.find(c=>c.id===id); },
+  avaliacoesDe(cid){ return this.d.avaliacoes.filter(a=>a.conteudoId===cid); },
+  minhaAvaliacao(uid,cid){ return this.d.avaliacoes.find(a=>a.conteudoId===cid&&a.usuarioId===uid); },
+  comentariosDe(cid){ return this.d.comentarios.filter(c=>c.conteudoId===cid).sort((a,b)=>b.criadoEm.localeCompare(a.criadoEm)); },
+  listasDe(uid){ return this.d.listas.filter(l=>l.usuarioId===uid).sort((a,b)=>b.criadoEm.localeCompare(a.criadoEm)); },
+  listasPublicas(){ return this.d.listas.filter(l=>l.publica).sort((a,b)=>b.criadoEm.localeCompare(a.criadoEm)); },
+  itensDe(listaId){ return this.d.itensLista.filter(i=>i.listaId===listaId); },
+  notaMedia(cid){
+    const a=this.avaliacoesDe(cid); if(!a.length) return null;
+    return a.reduce((s,x)=>s+x.nota,0)/a.length;
+  },
+  registrar(tipo,meta){ // §19 métricas
+    this.d.eventos.push({id:uid("ev"),tipo,usuarioId:Sessao.uid||null,meta:meta||null,ts:agora()});
+    if(this.d.eventos.length>900) this.d.eventos.splice(0,300);
+    this.salvar();
+  },
+  semente(){ return {versao:1, usuarios:[], sessao:null, catalogo:CATALOGO, generos:GENEROS, temas:TEMAS,
+    avaliacoes:[], comentarios:[], listas:[], itensLista:[], eventos:[]}; }
+};
+
+/* ---------- catálogo de demonstração (em produção: API TMDb, §14) ---------- */
+const GENEROS=["Ação","Animação","Aventura","Comédia","Documentário","Drama","Fantasia","Ficção científica","Romance","Suspense","Terror"];
+const TEMAS=["apocalipse","zumbi","viagem no tempo","inteligência artificial","distopia","vingança","amizade","família","investigação","sobrevivência","música","espaço","sobrenatural","desigualdade","amadurecimento","romance improvável","máfia","política","esporte","assalto"];
+
+function f(id,tipo,titulo,ano,dur,gen,temas,sinopse,nota,plat,c1,c2,dir){
+  return {id,tipo,titulo,ano,duracao:dur,generos:gen,temas,sinopse,notaBase:nota,plataformas:plat,c1,c2,direcao:dir};
+}
+const CATALOGO=[
+ f("c01","filme","Parasita",2019,"2h12",["Drama","Suspense"],["desigualdade","família","vingança"],"Uma família sem trabalho se infiltra, um por um, na casa de uma família rica — até o porão revelar o que ninguém queria ver.",8.5,["Prime Video"],"#3E2C5A","#0E7C6B","Bong Joon-ho"),
+ f("c02","filme","Cidade de Deus",2002,"2h10",["Drama"],["desigualdade","amadurecimento","máfia"],"Dois meninos crescem na mesma favela carioca e escolhem caminhos opostos: um pega a câmera, o outro pega a arma.",8.6,["Globoplay"],"#B4442A","#2B1A2E","Fernando Meirelles"),
+ f("c03","filme","Bacurau",2019,"2h11",["Suspense","Ficção científica"],["distopia","vingança","política"],"Um povoado do sertão some do mapa, literalmente, e descobre que virou cenário de caçada para forasteiros armados.",7.6,["Globoplay"],"#C2622B","#231A36","Kleber Mendonça Filho"),
+ f("c04","filme","Invasão Zumbi",2016,"1h58",["Ação","Terror"],["zumbi","apocalipse","família","sobrevivência"],"Um pai distante e a filha embarcam num trem para Busan no dia em que o país inteiro começa a se transformar.",7.6,["Prime Video"],"#7A1F2B","#141019","Yeon Sang-ho"),
+ f("c05","serie","The Last of Us",2023,"2 temporadas",["Drama","Ficção científica"],["zumbi","apocalipse","sobrevivência","família"],"Vinte anos depois de um fungo derrubar a civilização, um contrabandista atravessa o país escoltando uma adolescente imune.",8.7,["Max"],"#1F4034","#0F1A22","Craig Mazin"),
+ f("c06","filme","Interestelar",2014,"2h49",["Ficção científica","Aventura"],["espaço","família","apocalipse"],"Com a Terra virando poeira, um piloto atravessa um buraco de minhoca atrás de um planeta novo — e perde o tempo da filha pelo caminho.",8.7,["Prime Video"],"#1B3A63","#0B0E1A","Christopher Nolan"),
+ f("c07","filme","Duna",2021,"2h35",["Ficção científica","Aventura"],["política","espaço","vingança"],"Um herdeiro é jogado num planeta deserto onde a água é luxo, a areia é armadilha e a profecia é uma arma política.",8.0,["Max"],"#A9782F","#3A2410","Denis Villeneuve"),
+ f("c08","filme","Tudo em Todo Lugar ao Mesmo Tempo",2022,"2h19",["Ficção científica","Comédia"],["família","amizade","viagem no tempo"],"Uma dona de lavanderia atrasada no imposto de renda descobre que precisa salvar o multiverso sendo todas as versões que nunca foi.",7.8,["Prime Video"],"#8E2D6B","#12324A","Daniels"),
+ f("c09","filme","Corra!",2017,"1h44",["Terror","Suspense"],["investigação","desigualdade","sobrevivência"],"Um rapaz conhece a família da namorada num fim de semana no campo e sente que a hospitalidade tem segundo fundo.",7.7,["Netflix"],"#123A2A","#1B1020","Jordan Peele"),
+ f("c10","filme","Whiplash — Em Busca da Perfeição",2014,"1h47",["Drama","Música"],["música","amadurecimento"],"Um baterista quer ser grande e encontra um professor disposto a destruí-lo para descobrir se ele aguenta.",8.5,["Prime Video"],"#8E1B23","#100D12","Damien Chazelle"),
+ f("c11","filme","A Chegada",2016,"1h56",["Ficção científica","Drama"],["espaço","viagem no tempo","família"],"Doze naves pousam sem explicação e uma linguista precisa aprender a falar com quem não pensa o tempo como nós.",7.9,["Prime Video"],"#2C4A52","#101519","Denis Villeneuve"),
+ f("c12","serie","Breaking Bad",2008,"5 temporadas",["Drama","Suspense"],["máfia","família","vingança"],"Um professor de química com câncer decide cozinhar metanfetamina para deixar dinheiro à família e vai gostando do personagem.",9.5,["Netflix"],"#1E5B3A","#171214","Vince Gilligan"),
+ f("c13","serie","Dark",2017,"3 temporadas",["Ficção científica","Suspense"],["viagem no tempo","família","investigação"],"O sumiço de uma criança numa cidadezinha alemã abre uma caverna que liga quatro famílias e três épocas.",8.7,["Netflix"],"#1C3348","#0D1016","Baran bo Odar"),
+ f("c14","serie","Fleabag",2016,"2 temporadas",["Comédia","Drama"],["família","amadurecimento","romance improvável"],"Uma londrina em queda livre comenta a própria vida direto para você, entre o luto que não encara e o padre que não devia.",8.7,["Prime Video"],"#A8324F","#1B1226","Phoebe Waller-Bridge"),
+ f("c15","serie","Succession",2018,"4 temporadas",["Drama","Comédia"],["família","política","vingança"],"Quatro filhos disputam o império de mídia do pai, que promete a sucessão para todos e não entrega para ninguém.",8.9,["Max"],"#22384E","#12151B","Jesse Armstrong"),
+ f("c16","serie","Ruptura",2022,"2 temporadas",["Ficção científica","Suspense"],["distopia","investigação","sobrevivência"],"Funcionários aceitam separar cirurgicamente a memória do trabalho da memória da vida — e a metade de dentro começa a desconfiar.",8.7,["Apple TV+"],"#1D4E63","#0E1418","Dan Erickson"),
+ f("c17","serie","Chernobyl",2019,"Minissérie",["Drama","Documentário"],["política","sobrevivência","desigualdade"],"A reconstrução hora a hora do acidente nuclear e da máquina de mentiras que custou mais vidas que a explosão.",9.4,["Max"],"#4A5348","#131512","Craig Mazin"),
+ f("c18","serie","Cidade Invisível",2021,"2 temporadas",["Fantasia","Suspense"],["sobrenatural","investigação","família"],"Um policial descobre que as criaturas do folclore brasileiro vivem entre nós — e que a morte da esposa dele tem a ver com isso.",6.6,["Netflix"],"#2E5E3E","#131A16","Carlos Saldanha"),
+ f("c19","serie","Sintonia",2019,"4 temporadas",["Drama","Música"],["amizade","música","amadurecimento","desigualdade"],"Três amigos da zona sul de São Paulo apostam tudo no funk, na igreja e no tráfico, cada um no seu.",7.4,["Netflix"],"#B8443C","#1A1320","Kondzilla"),
+ f("c20","filme","O Auto da Compadecida",2000,"1h44",["Comédia","Aventura"],["amizade","política","sobrenatural"],"Dois amarelos do sertão vendem o mesmo golpe várias vezes até serem julgados no céu com a Compadecida de advogada.",8.6,["Globoplay"],"#C98B2A","#4A2A16","Guel Arraes"),
+ f("c21","filme","Central do Brasil",1998,"1h50",["Drama"],["família","amizade","amadurecimento"],"Uma escrevente de cartas da estação e um menino órfão atravessam o Nordeste atrás de um pai que talvez não exista.",8.0,["Globoplay"],"#8A5A2B","#25202B","Walter Salles"),
+ f("c22","filme","Tropa de Elite",2007,"1h55",["Ação","Drama"],["política","vingança","desigualdade"],"Um capitão do BOPE procura substituto antes de enlouquecer, enquanto a cidade se prepara para a visita do Papa.",8.1,["Netflix"],"#2C3A2E","#141317","José Padilha"),
+ f("c23","filme","Que Horas Ela Volta?",2015,"1h52",["Drama"],["desigualdade","família","amadurecimento"],"A filha da empregada chega em São Paulo para o vestibular e se recusa a obedecer as regras invisíveis da casa dos patrões.",7.7,["Globoplay"],"#2F6B5E","#1B1A26","Anna Muylaert"),
+ f("c24","filme","Ainda Estou Aqui",2024,"2h17",["Drama"],["família","política","vingança"],"Uma mãe de cinco filhos passa décadas exigindo do Estado o corpo e a verdade sobre o marido levado pela ditadura.",8.5,["Globoplay"],"#3C5A8A","#1A1B24","Walter Salles"),
+ f("c25","filme","Marte Um",2022,"1h55",["Drama"],["família","espaço","amadurecimento"],"Uma família da periferia de Contagem segura os próprios sonhos ao mesmo tempo: o do menino que quer ir a Marte e o de todo mundo em volta.",7.3,["Prime Video"],"#7C3B6A","#151726","Gabriel Martins"),
+ f("c26","filme","Homem-Aranha: Através do Aranhaverso",2023,"2h20",["Animação","Aventura"],["família","amizade","amadurecimento"],"Miles Morales descobre que existe uma corporação de Aranhas do multiverso e que ela decidiu qual dor ele tem de aceitar.",8.6,["Netflix"],"#B12B6B","#1B2F7A","Joaquim Dos Santos"),
+ f("c27","filme","Mad Max: Estrada da Fúria",2015,"2h00",["Ação","Ficção científica"],["apocalipse","sobrevivência","vingança","distopia"],"No deserto pós-colapso, uma comandante rouba as esposas de um tirano e dirige para o horizonte com ele atrás.",8.1,["Max"],"#C4561F","#2A1A16","George Miller"),
+ f("c28","filme","Ex Machina — Instinto Artificial",2014,"1h48",["Ficção científica","Suspense"],["inteligência artificial","investigação","sobrevivência"],"Um programador é convidado para testar se a androide do chefe é consciente, sem perceber quem está testando quem.",7.7,["Prime Video"],"#2B5A57","#101418","Alex Garland"),
+ f("c29","filme","Ela",2013,"2h06",["Romance","Ficção científica"],["inteligência artificial","romance improvável","amadurecimento"],"Um homem que escreve cartas de amor para estranhos se apaixona pelo sistema operacional que finalmente o escuta.",8.0,["Netflix"],"#C0524A","#5A2440","Spike Jonze"),
+ f("c30","serie","Arcane",2021,"2 temporadas",["Animação","Ação"],["família","desigualdade","vingança"],"Duas irmãs separadas pela guerra entre a cidade de cima e a de baixo viram líderes de lados opostos.",9.0,["Netflix"],"#5B2E8C","#123A63","Christian Linke"),
+ f("c31","filme","O Poço",2019,"1h34",["Terror","Ficção científica"],["distopia","sobrevivência","desigualdade"],"Uma prisão vertical alimenta os andares de cima primeiro, e cada mês você acorda num nível diferente.",6.9,["Netflix"],"#4A4038","#131114","Galder Gaztelu-Urrutia"),
+ f("c32","filme","Aquarius",2016,"2h26",["Drama"],["família","política","vingança"],"Uma crítica musical aposentada é a última moradora de um prédio em Boa Viagem e não vende por nada nesse mundo.",7.4,["Prime Video"],"#2E6A7C","#1A1C24","Kleber Mendonça Filho"),
+];
+
+/* ============================================================
+   2. AUTENTICAÇÃO  (RF01 cadastro, RF02 login)
+   ============================================================ */
+async function hash(txt){
+  try{
+    const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("eunis$"+txt));
+    return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+  }catch(e){ let h=5381; for(const c of "eunis$"+txt) h=((h<<5)+h+c.charCodeAt(0))>>>0; return "f"+h.toString(16); }
+}
+const EMAIL_RX=/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
+function forcaSenha(s){
+  let p=0; if(s.length>=8)p++; if(/[A-Z]/.test(s))p++; if(/[0-9]/.test(s))p++; if(/[^A-Za-z0-9]/.test(s))p++;
+  return p; // 0..4
+}
+const Sessao = {
+  uid:null,
+  carregar(){ const s=Banco.d.sessao; if(s && new Date(s.expiraEm)>new Date()) this.uid=s.usuarioId; else {Banco.d.sessao=null;Banco.salvar();} },
+  abrir(usuarioId,lembrar){
+    const dias = lembrar?30:1;
+    Banco.d.sessao={usuarioId,expiraEm:new Date(Date.now()+dias*864e5).toISOString()};
+    this.uid=usuarioId; Banco.salvar();
+  },
+  fechar(){ Banco.d.sessao=null; this.uid=null; Banco.salvar(); },
+  get user(){ return this.uid ? Banco.usuario(this.uid) : null; }
+};
+const ehPremium = () => Sessao.user?.plano==="premium";
+
+async function cadastrar({nome,email,senha}){
+  email=email.trim().toLowerCase();
+  if(Banco.usuarioPorEmail(email)) throw new Error("Esse e-mail já tem conta. Entre em vez de criar.");
+  const u={ id:uid("u"), nome:nome.trim(), email, senhaHash:await hash(senha), criadoEm:agora(),
+    plano:"free", bio:"", avatarCor:["#E0517A","#F2B04A","#5FD3A2","#7C7BF2","#3FB6D8","#E8854A"][Banco.d.usuarios.length%6],
+    generosFav:[], config:{tema:"sistema",filtroPalavroes:true,notificacoes:true,perfilPublico:false} };
+  Banco.d.usuarios.push(u); Banco.salvar(); Banco.registrar("cadastro",{email});
+  return u;
+}
+async function entrar({email,senha,lembrar}){
+  const u=Banco.usuarioPorEmail(email||"");
+  if(!u || u.senhaHash !== await hash(senha)) throw new Error("E-mail ou senha não conferem.");
+  Sessao.abrir(u.id,lembrar); Banco.registrar("login"); aplicarTema(); return u;
+}
+
+/* ---------- semente de comunidade: usuários e conteúdo social ---------- */
+async function semearComunidade(){
+  if(Banco.d.usuarios.length) return;
+  const gente=[
+    {nome:"Júlia Prado",email:"julia@eunis.app",plano:"premium",bio:"Escolho filme para dois. É mais difícil do que parece."},
+    {nome:"Pedro Lemos",email:"pedro@eunis.app",plano:"premium",bio:"Faço lista de tudo. Assisto metade."},
+    {nome:"Mariana Reis",email:"mariana@eunis.app",plano:"free",bio:"Série boa é a que dorme comigo."}
+  ];
+  const ids=[];
+  for(const g of gente){ const u=await cadastrar({nome:g.nome,email:g.email,senha:"eunis1234"}); u.plano=g.plano; u.bio=g.bio; ids.push(u.id); }
+  const [j,p,m]=ids;
+  const av=[[j,"c05",5],[j,"c08",4],[p,"c01",5],[p,"c16",5],[p,"c13",4],[m,"c14",5],[m,"c30",4],[p,"c04",4],[j,"c27",5]];
+  av.forEach(([u,c,n])=>Banco.d.avaliacoes.push({id:uid("a"),usuarioId:u,conteudoId:c,nota:n,resenha:"",criadoEm:agora()}));
+  const cm=[
+    [p,"c05","Segundo episódio da primeira temporada é o melhor roteiro de TV da década. Briguem comigo."],
+    [j,"c05","Assisti com meu namorado achando que ia ser só pancadaria e chorei duas vezes."],
+    [m,"c16","A trilha e o corredor branco me deixaram com raiva do meu próprio escritório."],
+    [p,"c01","O plano da escada diz tudo o que o filme quer dizer sem falar nada."],
+    [j,"c27","Colocaria de novo só pelo som. Fim do mundo nunca foi tão bonito."]
+  ];
+  cm.forEach(([u,c,t])=>Banco.d.comentarios.push({id:uid("cm"),usuarioId:u,conteudoId:c,texto:t,criadoEm:agora(),curtidas:[]}));
+  const l1={id:uid("l"),usuarioId:p,nome:"Fim do mundo com boa fotografia",descricao:"Apocalipse, mas bonito.",publica:true,criadoEm:agora()};
+  const l2={id:uid("l"),usuarioId:j,nome:"Para assistir a dois sem discussão",descricao:"Testado em campo.",publica:true,criadoEm:agora()};
+  Banco.d.listas.push(l1,l2);
+  [["c04",l1],["c05",l1],["c27",l1],["c31",l1],["c08",l2],["c20",l2],["c26",l2],["c14",l2]]
+    .forEach(([c,l])=>Banco.d.itensLista.push({id:uid("il"),listaId:l.id,conteudoId:c,addEm:agora()}));
+  Banco.d.sessao=null; Sessao.uid=null; Banco.salvar();
+}
+
+/* ============================================================
+   3. BUSCA
+   ============================================================ */
+const BRASILEIROS=["c02","c03","c18","c19","c20","c21","c22","c23","c24","c25","c32"];
+function nota(c){ const m=Banco.notaMedia(c.id); return m!=null ? (m*2+c.notaBase)/3 : c.notaBase; }
+function normal(s){ return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+
+const PARADAS=new Set(["que","com","uma","para","por","dos","das","sobre","algo","mais","meu","minha","filme","filmes","serie","series","seriado","assistir","quero","tipo","como","bem","muito","alguma","algum"]);
+const SINONIMOS={ // expressões → temas e gêneros do catálogo
+  "fim do mundo":["apocalipse"], "pos apocaliptico":["apocalipse"], "apocalipse":["apocalipse"],
+  "zumbi":["zumbi"], "zumbis":["zumbi"], "morto vivo":["zumbi"],
+  "viagem no tempo":["viagem no tempo"], "linha do tempo":["viagem no tempo"],
+  "inteligencia artificial":["inteligência artificial"], "robo":["inteligência artificial"], "ia":["inteligência artificial"],
+  "distopia":["distopia"], "distopico":["distopia"], "futuro sombrio":["distopia"],
+  "vinganca":["vingança"], "amizade":["amizade"], "familia":["família"], "familiar":["família"],
+  "investigacao":["investigação"], "misterio":["investigação"], "detetive":["investigação"],
+  "sobrevivencia":["sobrevivência"], "musica":["música"], "banda":["música"],
+  "espaco":["espaço"], "astronauta":["espaço"], "planeta":["espaço"],
+  "sobrenatural":["sobrenatural"], "folclore":["sobrenatural"], "fantasma":["sobrenatural"],
+  "desigualdade":["desigualdade"], "classe social":["desigualdade"], "pobreza":["desigualdade"],
+  "amadurecimento":["amadurecimento"], "adolescencia":["amadurecimento"],
+  "romance":["romance improvável"], "apaixonar":["romance improvável"], "casal":["romance improvável"],
+  "mafia":["máfia"], "crime":["máfia"], "trafico":["máfia"],
+  "politica":["política"], "ditadura":["política"], "esporte":["esporte"], "assalto":["assalto"], "roubo":["assalto"],
+  "chorar":["família"], "triste":["família"]
+};
+const SIN_GENERO={"medo":"Terror","terror":"Terror","assustar":"Terror","susto":"Terror","rir":"Comédia","engracado":"Comédia",
+  "comedia":"Comédia","acao":"Ação","pancadaria":"Ação","animacao":"Animação","desenho":"Animação","documentario":"Documentário",
+  "real":"Documentário","drama":"Drama","fantasia":"Fantasia","ficcao":"Ficção científica","sci fi":"Ficção científica",
+  "espacial":"Ficção científica","suspense":"Suspense","tenso":"Suspense","romantico":"Romance","aventura":"Aventura"};
+
+function buscarLocal(texto){ // reserva: roda quando a IA não está disponível
+  const q=normal(texto);
+  const toks=q.split(/[^a-z0-9]+/).filter(t=>t.length>2 && !PARADAS.has(t));
+  const temasAlvo=new Set(), generosAlvo=new Set();
+  for(const [chave,ts] of Object.entries(SINONIMOS)) if(q.includes(chave)) ts.forEach(t=>temasAlvo.add(t));
+  for(const [chave,g] of Object.entries(SIN_GENERO)) if(q.includes(chave)) generosAlvo.add(g);
+  const soSerie=/\bseries?\b|seriado|temporada|maratonar/.test(q);
+  const soFilme=/\bfilmes?\b|longa/.test(q);
+  const curto=/curto|rapido|ate 1h|1h[0-5]/.test(q);
+
+  const pontuados=Banco.d.catalogo.map(c=>{
+    let s=0;
+    c.temas.forEach(t=>{ if(temasAlvo.has(t)) s+=5; });
+    c.generos.forEach(g=>{ if(generosAlvo.has(g)) s+=3; });
+    const tit=normal(c.titulo), sin=normal(c.sinopse), dir=normal(c.direcao);
+    toks.forEach(t=>{
+      if(tit.includes(t)) s+=5;
+      else if(dir.includes(t)) s+=4;
+      else if(c.temas.some(x=>normal(x).includes(t))) s+=4;
+      else if(c.generos.some(g=>normal(g).includes(t))) s+=3;
+      else if(new RegExp("\\b"+t).test(sin)) s+=2;
+    });
+    if(/\bbrasil|brasileiro|nacional\b/.test(q) && ["c02","c03","c18","c19","c20","c21","c22","c23","c24","c25","c32"].includes(c.id)) s+=5;
+    if(curto && c.tipo==="filme" && /^1h/.test(c.duracao)) s+=2;
+    return {c,s};
+  }).filter(o=>o.s>=3 && !(soSerie&&o.c.tipo!=="serie") && !(soFilme&&o.c.tipo!=="filme"));
+
+  pontuados.sort((a,b)=>b.s-a.s||nota(b.c)-nota(a.c));
+  if(!pontuados.length){ // nada bateu: devolve os mais bem avaliados do tipo pedido
+    return Banco.d.catalogo
+      .filter(c=>!(soSerie&&c.tipo!=="serie") && !(soFilme&&c.tipo!=="filme"))
+      .sort((a,b)=>nota(b)-nota(a)).slice(0,5).map(c=>c.id);
+  }
+  return pontuados.slice(0,6).map(o=>o.c.id);
+}
+
+async function buscarIA(texto){ // RF04
+  Banco.registrar("busca_ia",{texto});
+  const claude = window.claude;
+  let sample=null;
+  try{ sample = claude && claude.use ? await claude.use("sample") : null; }catch(e){ sample=null; }
+  if(!sample) return {ids:buscarLocal(texto), explicacao:null, fonte:"local"};
+  const cat = Banco.d.catalogo.map(c=>({id:c.id,t:c.titulo,ano:c.ano,tipo:c.tipo,gen:c.generos,temas:c.temas,s:c.sinopse}));
+  try{
+    const r = await sample.json([{role:"user",content:
+`Você é o motor de busca do EUNIS, app brasileiro de descoberta de filmes e séries.
+O usuário descreve o que quer assistir com as próprias palavras, sem saber o nome do título.
+Escolha de 3 a 6 itens do catálogo abaixo que melhor atendem ao pedido, do mais adequado ao menos.
+Se nada servir bem, devolva a lista vazia.
+
+Pedido: "${texto}"
+
+Catálogo (JSON): ${JSON.stringify(cat)}
+
+Responda SOMENTE com JSON, sem markdown, no formato:
+{"ids":["c05"],"explicacao":"uma frase curta em português explicando o critério que você usou","interpretacao":["até 4 palavras-chave do pedido"]}`}],
+      {modelTier:"quick", cache:true});
+    const ids=(r?.ids||[]).filter(id=>Banco.conteudo(id));
+    if(!ids.length) return {ids:buscarLocal(texto), explicacao:r?.explicacao||null, fonte:"ia"};
+    return {ids, explicacao:r?.explicacao||null, interpretacao:r?.interpretacao||[], fonte:"ia"};
+  }catch(e){
+    return {ids:buscarLocal(texto), explicacao:null, fonte:"local"};
+  }
+}
+
+function buscarPorFiltros(fl){ // RF05
+  Banco.registrar("busca_filtros",fl);
+  return Banco.d.catalogo.filter(c=>{
+    if(fl.tipo&&fl.tipo!=="todos"&&c.tipo!==fl.tipo) return false;
+    if(fl.generos?.length && !fl.generos.some(g=>c.generos.includes(g))) return false;
+    if(fl.temas?.length && !fl.temas.some(t=>c.temas.includes(t))) return false;
+    if(fl.plataformas?.length && !fl.plataformas.some(p=>c.plataformas.includes(p))) return false;
+    if(fl.notaMin && nota(c)<fl.notaMin) return false;
+    if(fl.anoMin && c.ano<fl.anoMin) return false;
+    if(fl.texto && !normal(c.titulo+" "+c.sinopse+" "+c.direcao).includes(normal(fl.texto))) return false;
+    if(fl.curto && !(c.tipo==="filme" && /^1h/.test(c.duracao))) return false;
+    if(fl.brasil && !BRASILEIROS.includes(c.id)) return false;
+    return true;
+  }).sort((a,b)=>nota(b)-nota(a));
+}
+
+/* ============================================================
+   4. COMPONENTES
+   ============================================================ */
+function cartaz(c,{w,sel}={}){
+  const n=nota(c);
+  const d=el("button",{class:"cartaz",style:`--c1:${c.c1};--c2:${c.c2};${w?`width:${w}px`:""}`,
+    "aria-label":c.titulo, onclick:()=>ir("conteudo",{id:c.id})},
+    sel?el("span",{class:"sel"},sel):null,
+    el("span",{class:"tit"},c.titulo),
+    el("span",{class:"meta"},`${c.ano} · ★ ${n.toFixed(1)}`));
+  return d;
+}
+function linhaConteudo(c,extra){
+  const n=nota(c);
+  return el("button",{class:"linha",onclick:()=>ir("conteudo",{id:c.id})},
+    el("span",{class:"cartaz",style:`--c1:${c.c1};--c2:${c.c2}`}),
+    el("span",{class:"info"},
+      el("strong",{},c.titulo),
+      el("span",{},`${c.tipo==="filme"?"Filme":"Série"} · ${c.ano} · ${c.generos.slice(0,2).join(", ")}`),
+      extra?el("span",{class:"mini"},extra):null),
+    el("span",{class:"nota"},"★ "+n.toFixed(1)));
+}
+function avatar(u,tam){
+  return el("span",{class:"av",style:`background:${u?.avatarCor||"#888"};${tam?`width:${tam}px;height:${tam}px;font-size:${tam/2.6}px`:""}`},
+    (u?.nome||"?").trim()[0].toUpperCase());
+}
+function estrelas(n){ const c=Math.round(n/2); return el("span",{class:"estrelas"},"★".repeat(c)+"☆".repeat(5-c)); }
+
+function abrirFolha(titulo,...conteudo){
+  const fechar=()=>{$("#folha").innerHTML="";document.removeEventListener("keydown",onEsc);};
+  const onEsc=e=>{if(e.key==="Escape")fechar();};
+  document.addEventListener("keydown",onEsc);
+  const f=el("div",{class:"folha-fundo",onclick:e=>{if(e.target===f)fechar();}},
+    el("div",{class:"folha",role:"dialog","aria-modal":"true"},
+      el("div",{class:"puxador"}),
+      titulo?el("h2",{style:"margin-bottom:14px"},titulo):null,
+      ...conteudo));
+  $("#folha").innerHTML=""; $("#folha").append(f);
+  return fechar;
+}
+function exigirPremium(recurso){ // §11 e §12
+  if(ehPremium()) return true;
+  const fechar=abrirFolha("Isso é do Premium",
+    el("p",{class:"sub",style:"margin-bottom:16px"},`${recurso} faz parte do plano Premium. O plano gratuito continua com catálogo completo, busca por IA, listas privadas e leitura da comunidade.`),
+    el("div",{class:"card",style:"margin-bottom:16px"},
+      el("strong",{},"No Premium você libera"),
+      el("ul",{style:"margin:8px 0 0;padding-left:20px;font-size:14.5px;color:var(--text-2)"},
+        el("li",{},"Avaliar e comentar títulos"),
+        el("li",{},"Publicar listas para a comunidade"),
+        el("li",{},"Perfil personalizado com bio e resenhas"))),
+    el("button",{class:"btn btn-1",onclick:()=>{
+        const u=Sessao.user; u.plano="premium"; Banco.salvar(); Banco.registrar("premium_ativado");
+        fechar(); avisar("Premium ativado"); render();
+      }},"Ativar Premium (demonstração)"),
+    el("button",{class:"btn btn-3",style:"margin-top:8px",onclick:()=>fechar()},"Agora não"));
+  return false;
+}
+
+/* ============================================================
+   5. ROTEADOR
+   ============================================================ */
+let rota={nome:"abertura",p:{}};
+let pilha=[];
+const RAIZ=["inicio","buscar","listas","perfil","abertura"];
+function ir(nome,p={},limpar){
+  if(limpar||RAIZ.includes(nome)) pilha=[];
+  else { pilha.push(rota); if(pilha.length>20) pilha.shift(); }
+  rota={nome,p}; $("#tela").scrollTop=0; render();
+}
+function voltarRota(){
+  const r=pilha.pop();
+  if(r){ rota=r; $("#tela").scrollTop=0; render(); } else ir("inicio",{},true);
+}
+
+const TELAS={};
+function render(){
+  const t=$("#tela"); t.innerHTML="";
+  const publica=["abertura","cadastro","login","recuperar","onboarding"].includes(rota.nome);
+  if(!publica && !Sessao.uid){ rota={nome:"abertura",p:{}}; }
+  (TELAS[rota.nome]||TELAS.inicio)(t,rota.p);
+  montarNav(publica);
+}
+function montarNav(esconder){
+  const n=$("#nav");
+  if(esconder||!Sessao.uid){ n.hidden=true; return; }
+  n.hidden=false; n.innerHTML="";
+  [["inicio","◱","Início"],["buscar","◎","Buscar"],["listas","☰","Listas"],["perfil","◔","Perfil"]]
+    .forEach(([r,ic,rot])=>{
+      n.append(el("button",{class:rota.nome===r?"on":"",onclick:()=>ir(r)},
+        el("span",{class:"ic"},ic), el("span",{},rot)));
+    });
+}
+function cabecalho(titulo,acao){
+  return el("div",{class:"topo"},
+    el("h1",{class:"marca"},titulo?el("span",{style:"font-size:25px"},titulo):el("span",{},"EUN",el("em",{},"I"),"S")),
+    acao||null);
+}
+function voltar(onde,txt){ return el("button",{class:"voltar",onclick:()=>typeof onde==="function"?onde():ir(onde)},"← "+(txt||"Voltar")); }
+
+/* ============================================================
+   6. TELAS DE ACESSO  (jornada §13: abertura → cadastro → onboarding → home)
+   ============================================================ */
+TELAS.abertura=t=>{
+  t.append(
+    el("div",{style:"padding:56px 24px 0"},
+      el("div",{style:"font-family:var(--ff-display);font-weight:700;font-size:15px;letter-spacing:.34em;color:var(--accent)"},"E U N I S"),
+      el("h1",{style:"margin-top:26px;font-size:40px;line-height:1.02"},"Você já sabe o que quer assistir. Só não sabe o nome."),
+      el("p",{class:"sub",style:"font-size:16px;max-width:30ch"},"Descreva o filme ou a série com as suas palavras. A gente encontra, organiza e mostra o que a comunidade achou.")),
+    el("div",{class:"facho",style:"margin:28px 20px 0"},
+      el("p",{style:"margin:0 0 10px;font-size:13px"},"Pedidos reais que funcionam aqui:"),
+      el("div",{style:"display:grid;gap:8px"},
+        ...["filme de zumbi com fim do mundo","série para dormir sem pensar muito","algo bonito e triste, umas duas horas"]
+          .map(x=>el("div",{class:"card",style:"padding:11px 14px;font-size:14px"},"“"+x+"”")))),
+    el("div",{class:"wrap",style:"margin-top:26px;padding-bottom:30px"},
+      el("button",{class:"btn btn-1",onclick:()=>ir("cadastro")},"Criar minha conta"),
+      el("button",{class:"btn btn-2",style:"margin-top:10px",onclick:()=>ir("login")},"Já tenho conta"),
+      el("p",{class:"mini",style:"text-align:center;margin-top:16px"},"Catálogo de demonstração com 32 títulos. Na produção vem da API TMDb."))
+  );
+};
+
+TELAS.cadastro=t=>{ // RF01
+  const erros=el("div");
+  const campo=(id,rot,tipo,ph,ajuda)=>el("div",{class:"campo"},
+    el("label",{for:id},rot), el("input",{id,type:tipo,placeholder:ph,autocomplete:tipo==="password"?"new-password":"on"}),
+    ajuda?el("div",{class:"ajuda"},ajuda):null);
+  const barra=el("div",{class:"forca"},el("i"));
+  const f=el("div",{class:"wrap"},
+    el("h1",{},"Criar conta"),
+    el("p",{class:"sub",style:"margin-bottom:22px"},"Leva menos tempo do que escolher um filme sozinho."),
+    campo("n","Como te chamamos","text","Seu nome"),
+    campo("e","E-mail","email","voce@email.com"),
+    (()=>{const c=campo("s","Senha","password","Pelo menos 8 caracteres","Use letras, números e um símbolo para ficar forte.");
+      c.querySelector("input").addEventListener("input",ev=>{
+        const p=forcaSenha(ev.target.value);
+        const i=barra.firstChild; i.style.width=(p*25)+"%";
+        i.style.background=p<=1?"var(--alerta)":p===2?"var(--accent)":"var(--ok)";});
+      c.insertBefore(barra,c.querySelector(".ajuda")); return c;})(),
+    campo("s2","Confirmar senha","password","Repita a senha"),
+    el("label",{class:"opt",style:"border:none"},
+      el("input",{type:"checkbox",id:"termos",style:"width:auto"}),
+      el("span",{class:"mini",style:"flex:1"},"Li e aceito os termos de uso e a política de privacidade.")),
+    erros,
+    el("button",{class:"btn btn-1",style:"margin-top:8px",id:"enviar",onclick:enviar},"Criar conta"),
+    el("button",{class:"btn btn-3",style:"margin-top:6px",onclick:()=>ir("login")},"Já tenho conta"));
+  t.append(voltar("abertura"),f);
+
+  async function enviar(){
+    erros.innerHTML="";
+    const nome=$("#n").value.trim(), email=$("#e").value.trim(), s1=$("#s").value, s2=$("#s2").value;
+    const e=[];
+    if(nome.length<2)e.push("Escreva seu nome.");
+    if(!EMAIL_RX.test(email))e.push("Esse e-mail não parece válido.");
+    if(s1.length<8)e.push("A senha precisa de pelo menos 8 caracteres.");
+    if(s1!==s2)e.push("As senhas não são iguais.");
+    if(!$("#termos").checked)e.push("Aceite os termos para continuar.");
+    if(e.length){ e.forEach(x=>erros.append(el("span",{class:"erro"},x))); return; }
+    $("#enviar").disabled=true;
+    try{
+      const u=await cadastrar({nome,email,senha:s1});
+      Sessao.abrir(u.id,true); aplicarTema(); ir("onboarding");
+    }catch(err){ erros.append(el("span",{class:"erro"},err.message)); $("#enviar").disabled=false; }
+  }
+};
+
+TELAS.login=t=>{ // RF02
+  const erro=el("div");
+  const contas=Banco.d.usuarios.filter(u=>u.email.endsWith("@eunis.app"));
+  t.append(voltar("abertura"),
+    el("div",{class:"wrap"},
+      el("h1",{},"Entrar"),
+      el("p",{class:"sub",style:"margin-bottom:22px"},"Suas listas e avaliações continuam de onde pararam."),
+      el("div",{class:"campo"},el("label",{for:"e"},"E-mail"),el("input",{id:"e",type:"email",placeholder:"voce@email.com",autocomplete:"username"})),
+      el("div",{class:"campo"},el("label",{for:"s"},"Senha"),el("input",{id:"s",type:"password",placeholder:"Sua senha",autocomplete:"current-password"})),
+      el("label",{class:"opt",style:"border:none;padding-top:0"},
+        el("input",{type:"checkbox",id:"lembrar",checked:true,style:"width:auto"}),
+        el("span",{style:"flex:1;font-size:14px"},"Continuar conectado por 30 dias")),
+      erro,
+      el("button",{class:"btn btn-1",id:"go",onclick:enviar},"Entrar"),
+      el("button",{class:"btn btn-3",style:"margin-top:6px",onclick:()=>ir("recuperar")},"Esqueci minha senha"),
+      contas.length?el("div",{class:"fita"},el("span",{},"Contas de teste: "+contas.map(c=>c.email).join(", ")+" — senha eunis1234")):null
+    ));
+  $("#s").addEventListener("keydown",e=>{if(e.key==="Enter")enviar();});
+  async function enviar(){
+    erro.innerHTML=""; $("#go").disabled=true;
+    try{ await entrar({email:$("#e").value,senha:$("#s").value,lembrar:$("#lembrar").checked});
+      const u=Sessao.user; ir(u.generosFav.length?"inicio":"onboarding");
+    }catch(err){ erro.append(el("span",{class:"erro"},err.message)); $("#go").disabled=false; }
+  }
+};
+
+TELAS.recuperar=t=>{
+  t.append(voltar("login"),el("div",{class:"wrap"},
+    el("h1",{},"Recuperar senha"),
+    el("p",{class:"sub",style:"margin-bottom:20px"},"Informe o e-mail da conta. No MVP em produção isso dispara um link de redefinição válido por 30 minutos."),
+    el("div",{class:"campo"},el("label",{for:"e"},"E-mail"),el("input",{id:"e",type:"email",placeholder:"voce@email.com"})),
+    el("button",{class:"btn btn-1",onclick:()=>{ avisar("Se existir conta, o link foi enviado."); ir("login"); }},"Enviar link")));
+};
+
+TELAS.onboarding=t=>{
+  const u=Sessao.user; const sel=new Set(u.generosFav);
+  const grade=el("div",{style:"display:flex;flex-wrap:wrap;gap:8px"});
+  Banco.d.generos.forEach(g=>{
+    const b=el("button",{class:"chip"+(sel.has(g)?" on":""),onclick:()=>{
+      sel.has(g)?sel.delete(g):sel.add(g); b.classList.toggle("on"); cont.disabled=sel.size<2;
+      cont.textContent=sel.size<2?"Escolha pelo menos 2":"Continuar";}},g);
+    grade.append(b);
+  });
+  const cont=el("button",{class:"btn btn-1",style:"margin-top:24px",disabled:sel.size<2,onclick:()=>{
+    u.generosFav=[...sel]; Banco.salvar(); Banco.registrar("onboarding_concluido",{generos:u.generosFav.length});
+    avisar("Pronto, "+u.nome.split(" ")[0]+"!"); ir("inicio");
+  }},sel.size<2?"Escolha pelo menos 2":"Continuar");
+  t.append(el("div",{class:"wrap",style:"padding-top:44px"},
+    el("h1",{},"O que costuma te pegar?"),
+    el("p",{class:"sub",style:"margin-bottom:22px"},"Escolha dois ou mais gêneros. Isso monta a sua home — dá para mudar depois nas configurações."),
+    grade, cont,
+    el("button",{class:"btn btn-3",style:"margin-top:4px",onclick:()=>ir("inicio")},"Pular por enquanto")));
+};
+
+/* ============================================================
+   7. HOME  (§10 feed de tendências)
+   ============================================================ */
+const EXEMPLOS=["filme de zumbi com fim do mundo","algo bonito e triste, umas duas horas",
+  "série para ver um episódio por noite","comédia brasileira para a família","terror sem susto barato"];
+
+function caixaIA(t,{titulo,texto}={}){
+  const ta=el("textarea",{placeholder:"descreva o que você quer ver…",rows:1,
+    onkeydown:e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();disparar();}}});
+  const disparar=()=>{const q=ta.value.trim(); if(q.length<3){avisar("Descreva um pouco mais.");return;} ir("resultadosIA",{q});};
+  const ex=EXEMPLOS[Math.floor(Math.random()*EXEMPLOS.length)];
+  t.append(el("div",{class:"facho"},
+    el("h2",{},titulo||"Descreva. A gente acha."),
+    el("p",{},texto||"Sem saber o nome do filme. Diga o clima, o tema, o tempo que você tem."),
+    el("div",{class:"buscaia"},ta,el("button",{class:"btn btn-1 btn-sm",onclick:disparar},"Buscar")),
+    el("p",{class:"exemplo"},"Tente ",
+      el("button",{onclick:()=>{ta.value=ex;disparar();}},"“"+ex+"”"))));
+}
+
+// categorias que os usuários mais procuram (§10 do PRD)
+const TRILHAS=[
+  {rot:"Para ver a dois",        filtros:{generos:["Romance","Comédia","Aventura","Animação"],temas:["romance improvável","família","amizade"]}},
+  {rot:"Fim do mundo",           filtros:{temas:["apocalipse","zumbi","distopia"]}},
+  {rot:"Suspense e mistério",    filtros:{generos:["Suspense"],temas:["investigação","máfia","vingança"]}},
+  {rot:"Ficção científica",      filtros:{generos:["Ficção científica"]}},
+  {rot:"Comédia para relaxar",   filtros:{generos:["Comédia","Animação"]}},
+  {rot:"Cabe numa noite curta",  filtros:{curto:true}}
+];
+
+TELAS.inicio=t=>{
+  const u=Sessao.user;
+  Banco.registrar("abriu_home");
+  const fav=u.generosFav;
+  const alta=[...Banco.d.catalogo].sort((a,b)=>nota(b)-nota(a)).slice(0,7);
+  const paraVoce=[...Banco.d.catalogo].filter(c=>fav.some(g=>c.generos.includes(g))&&!alta.slice(0,3).includes(c)).sort((a,b)=>nota(b)-nota(a));
+  const brasil=Banco.d.catalogo.filter(c=>BRASILEIROS.includes(c.id));
+  const series=Banco.d.catalogo.filter(c=>c.tipo==="serie").sort((a,b)=>nota(b)-nota(a));
+
+  t.append(cabecalho(null, el("button",{class:"iconbtn","aria-label":"Configurações",onclick:()=>ir("config")},"⚙")));
+  t.append(el("p",{class:"sub",style:"padding:0 20px 2px"},`Boa sessão, ${u.nome.split(" ")[0]}.`));
+
+  // --- carrossel grande: Em alta da semana ---
+  t.append(el("div",{class:"secao wrap",style:"margin:18px 0 0"},el("h2",{},"Em alta da semana")));
+  const trilho=el("div",{class:"trilho"});
+  alta.forEach((c,i)=>{
+    trilho.append(el("button",{class:"destaque",style:`--c1:${c.c1};--c2:${c.c2}`,onclick:()=>ir("conteudo",{id:c.id})},
+      el("span",{class:"posicao"},(i+1)+"º da semana"),
+      el("h3",{},c.titulo),
+      el("span",{class:"linhameta"},`${c.tipo==="filme"?"Filme":"Série"} · ${c.ano} · ${c.duracao} · ★ ${nota(c).toFixed(1)}`),
+      el("span",{class:"frase"},c.sinopse)));
+  });
+  const pontos=el("div",{class:"pontos"},...alta.map((_,i)=>el("i",{class:i===0?"on":""})));
+  trilho.addEventListener("scroll",()=>{
+    const i=Math.round(trilho.scrollLeft/(trilho.scrollWidth/alta.length));
+    [...pontos.children].forEach((d,k)=>d.classList.toggle("on",k===Math.min(i,alta.length-1)));
+  },{passive:true});
+  t.append(el("div",{class:"palco"},trilho,pontos));
+
+  // --- busca por intenção, logo abaixo ---
+  t.append(el("div",{style:"height:26px"}));
+  caixaIA(t);
+
+  const secao=(titulo,itens,verTudo)=>{
+    if(!itens.length)return;
+    t.append(el("div",{class:"secao wrap"}, el("h2",{},titulo), verTudo?el("button",{onclick:verTudo},"ver tudo"):null));
+    const car=el("div",{class:"carrossel"}); itens.slice(0,12).forEach(c=>car.append(cartaz(c))); t.append(car);
+  };
+  if(paraVoce.length) secao("Porque você curte "+fav.slice(0,2).join(" e "),paraVoce,()=>ir("resultados",{filtros:{generos:fav},titulo:"Para você"}));
+
+  // trilhas por categoria — as buscas mais comuns viram atalho
+  TRILHAS.forEach(tr=>{
+    const itens=buscarPorFiltros(tr.filtros);
+    secao(tr.rot,itens,()=>ir("resultados",{filtros:tr.filtros,titulo:tr.rot}));
+  });
+
+  secao("Feito no Brasil",brasil,()=>ir("resultados",{filtros:{brasil:true},titulo:"Feito no Brasil"}));
+  secao("Séries para maratonar",series,()=>ir("resultados",{filtros:{tipo:"serie"},titulo:"Séries para maratonar"}));
+
+  const pub=Banco.listasPublicas().slice(0,3);
+  if(pub.length){
+    t.append(el("div",{class:"secao wrap"},el("h2",{},"Listas da comunidade"),el("button",{onclick:()=>ir("listas",{aba:"comunidade"})},"ver tudo")));
+    const box=el("div",{class:"wrap"}); pub.forEach(l=>box.append(cardLista(l))); t.append(box);
+  }
+  t.append(el("div",{class:"wrap"},el("div",{class:"fita"},"Catálogo de demonstração. Em produção, títulos e disponibilidade vêm da API TMDb.")));
+};
+
+function cardLista(l){
+  const dono=Banco.usuario(l.usuarioId); const itens=Banco.itensDe(l.id);
+  const capas=itens.slice(0,4).map(i=>Banco.conteudo(i.conteudoId)).filter(Boolean);
+  return el("button",{class:"card linha",style:"margin-top:12px",onclick:()=>ir("lista",{id:l.id})},
+    el("span",{style:"display:flex;flex:none"},...capas.map((c,i)=>
+      el("span",{class:"cartaz",style:`--c1:${c.c1};--c2:${c.c2};width:30px;border-radius:5px;margin-left:${i?-12:0}px;box-shadow:0 0 0 2px var(--surface)`}))),
+    el("span",{class:"info"},el("strong",{},l.nome),
+      el("span",{},`${itens.length} ${itens.length===1?"título":"títulos"} · ${l.publica?"pública":"privada"} · por ${dono?.nome.split(" ")[0]||"—"}`)));
+}
+
+/* ============================================================
+   8. BUSCA: IA e FILTROS
+   ============================================================ */
+TELAS.buscar=t=>{
+  const f={tipo:"todos",generos:[],temas:[],plataformas:[],notaMin:0,anoMin:0,texto:""};
+  const plataformas=[...new Set(Banco.d.catalogo.flatMap(c=>c.plataformas))];
+
+  t.append(cabecalho("Buscar"));
+  caixaIA(t,{titulo:"Descreva. A gente acha.",texto:"A busca por IA entende o pedido em português comum."});
+  t.append(el("div",{class:"wrap"},el("hr")));
+
+  // campo simples + tipo
+  const campo=el("input",{placeholder:"Buscar por título, tema ou direção",oninput:e=>{f.texto=e.target.value;atualizar();}});
+  t.append(el("div",{class:"wrap"},
+    el("div",{class:"busca-simples"},el("span",{style:"color:var(--text-2)"},"⌕"),campo),
+    el("div",{class:"segment"},
+      ...[["todos","Tudo"],["filme","Filmes"],["serie","Séries"]].map(([k,r])=>
+        el("button",{class:f.tipo===k?"on":"",onclick:e=>{
+          f.tipo=k;[...e.currentTarget.parentNode.children].forEach(b=>b.classList.remove("on"));
+          e.currentTarget.classList.add("on");atualizar();}},r)))));
+
+  // explorador de categorias: tudo cabe, nada aparece de uma vez
+  const caixa=el("div",{class:"wrap",style:"margin-top:8px"});
+  const grupos=[
+    {rot:"Gêneros",chave:"generos",ops:Banco.d.generos},
+    {rot:"Temas",chave:"temas",ops:Banco.d.temas},
+    {rot:"Onde assistir",chave:"plataformas",ops:plataformas}
+  ];
+  const contas={};
+  grupos.forEach(g=>{
+    const conta=el("span",{class:"conta"});
+    contas[g.chave]=()=>{conta.textContent=f[g.chave].length?f[g.chave].length+" ":"";};
+    const malha=el("div",{class:"malha"},...g.ops.map(o=>
+      el("button",{class:"chip",onclick:e=>{
+        const i=f[g.chave].indexOf(o); i<0?f[g.chave].push(o):f[g.chave].splice(i,1);
+        e.currentTarget.classList.toggle("on"); contas[g.chave](); atualizar();}},o)));
+    const cat=el("div",{class:"cat"},
+      el("button",{class:"cab",onclick:()=>cat.classList.toggle("aberta")},
+        el("strong",{},g.rot),conta,el("span",{class:"seta"},"›")),
+      el("div",{class:"corpo"},malha));
+    caixa.append(cat); contas[g.chave]();
+  });
+
+  // nota e ano num único grupo
+  const notaL=el("span",{class:"mini"},"qualquer nota");
+  const anoL=el("span",{class:"mini"},"qualquer ano");
+  const notaIn=el("input",{type:"range",min:0,max:9,step:.5,value:0,style:"width:100%",
+    oninput:e=>{f.notaMin=+e.target.value;notaL.textContent=f.notaMin?`nota ${f.notaMin.toFixed(1)} ou mais`:"qualquer nota";contaNA();atualizar();}});
+  const anoIn=el("input",{type:"range",min:1990,max:2024,step:1,value:1990,style:"width:100%",
+    oninput:e=>{f.anoMin=+e.target.value;anoL.textContent=f.anoMin>1990?`de ${f.anoMin} em diante`:"qualquer ano";contaNA();atualizar();}});
+  const contaNAel=el("span",{class:"conta"});
+  const contaNA=()=>{const n=(f.notaMin?1:0)+(f.anoMin>1990?1:0);contaNAel.textContent=n?n+" ":"";};
+  const catNA=el("div",{class:"cat"},
+    el("button",{class:"cab",onclick:()=>catNA.classList.toggle("aberta")},
+      el("strong",{},"Nota e ano"),contaNAel,el("span",{class:"seta"},"›")),
+    el("div",{class:"corpo"},
+      el("div",{style:"margin-bottom:14px"},el("div",{class:"mini",style:"margin-bottom:6px"},"Nota mínima"),notaIn,notaL),
+      el("div",{},el("div",{class:"mini",style:"margin-bottom:6px"},"A partir do ano"),anoIn,anoL)));
+  caixa.append(catNA);
+  t.append(caixa);
+
+  const ver=el("button",{class:"btn btn-1",onclick:()=>ir("resultados",{filtros:JSON.parse(JSON.stringify(f)),titulo:rotulo()})});
+  const limpar=el("button",{class:"btn btn-3",style:"margin-top:4px",onclick:()=>ir("buscar",{},true)},"Limpar seleção");
+  t.append(el("div",{class:"wrap"},el("div",{class:"barra-res"},ver,limpar)));
+
+  function rotulo(){
+    const p=[...f.generos,...f.temas,...f.plataformas];
+    return p.length?p.slice(0,2).join(" + ")+(p.length>2?" +"+(p.length-2):""):"Resultados";
+  }
+  function atualizar(){
+    const n=buscarPorFiltros(f).length;
+    ver.textContent = n ? `Ver ${n} ${n===1?"título":"títulos"}` : "Nenhum título com essa combinação";
+    ver.disabled = n===0;
+  }
+  atualizar();
+};
+
+TELAS.filtros=t=>TELAS.buscar(t);
+
+TELAS.resultadosIA=(t,p)=>{
+  t.append(voltar(voltarRota));
+  t.append(el("div",{class:"wrap"},
+    el("h2",{},"“"+p.q+"”"),
+    el("p",{class:"sub"},"Interpretando o pedido e comparando com o catálogo.")));
+  const area=el("div",{class:"wrap",style:"margin-top:10px"},
+    el("div",{class:"pensando"},el("i"),el("i"),el("i"),el("span",{style:"margin-left:6px"},"Lendo o que você pediu…")));
+  t.append(area);
+  buscarIA(p.q).then(r=>{
+    area.innerHTML="";
+    if(!r.ids.length){
+      area.append(el("div",{class:"vazio"},el("h3",{},"Nada bateu com isso"),
+        el("p",{},"Tente descrever o clima ou o tema em vez do enredo exato."),
+        el("button",{class:"btn btn-2",style:"margin-top:14px",onclick:()=>ir("buscar")},"Tentar de novo")));
+      return;
+    }
+    if(r.explicacao) area.append(el("div",{class:"fita",style:"margin:0 0 14px"},el("span",{},r.explicacao)));
+    r.ids.forEach((id,i)=>{ const c=Banco.conteudo(id);
+      area.append(el("div",{class:"card",style:"margin-bottom:10px"},
+        linhaConteudo(c), el("p",{class:"mini",style:"margin:10px 0 0"},c.sinopse))); });
+    area.append(el("p",{class:"mini",style:"text-align:center;margin-top:16px"},
+      r.fonte==="ia"?"Resultados interpretados por IA.":"Interpretação local — a IA não respondeu desta vez."));
+  });
+};
+
+TELAS.resultados=(t,p)=>{
+  const itens=buscarPorFiltros(p.filtros||{});
+  t.append(voltar(voltarRota),el("div",{class:"wrap"},
+    el("h1",{},p.titulo||"Resultados"),
+    el("p",{class:"sub",style:"margin-bottom:18px"},`${itens.length} ${itens.length===1?"título":"títulos"}`)));
+  if(!itens.length){ t.append(el("div",{class:"vazio"},el("h3",{},"Nenhum título com essa combinação"),
+    el("p",{},"Tire um filtro e tente de novo, ou peça para a IA em linguagem natural."),
+    el("button",{class:"btn btn-2",style:"margin-top:14px",onclick:()=>ir("buscar")},"Ir para a busca"))); return; }
+  const g=el("div",{class:"grade"}); itens.forEach(c=>g.append(cartaz(c)));
+  t.append(el("div",{class:"wrap"},g));
+};
+
+/* ============================================================
+   9. PÁGINA DO CONTEÚDO  (RF03, RF06, RF07, RF08)
+   ============================================================ */
+TELAS.conteudo=(t,p)=>{
+  const c=Banco.conteudo(p.id); if(!c){ir("inicio");return;}
+  const u=Sessao.user; Banco.registrar("abriu_conteudo",{id:c.id});
+  const media=Banco.notaMedia(c.id); const minha=Banco.minhaAvaliacao(u.id,c.id);
+
+  t.append(voltar(voltarRota,"Voltar"));
+  t.append(el("div",{class:"wrap",style:"display:flex;gap:16px;align-items:flex-start"},
+    el("span",{class:"cartaz",style:`--c1:${c.c1};--c2:${c.c2};width:104px;flex:none`}),
+    el("div",{style:"flex:1;min-width:0"},
+      el("h1",{style:"font-size:26px"},c.titulo),
+      el("p",{class:"sub"},`${c.tipo==="filme"?"Filme":"Série"} · ${c.ano} · ${c.duracao}`),
+      el("p",{class:"sub"},"Direção de "+c.direcao),
+      el("div",{style:"display:flex;align-items:center;gap:8px;margin-top:10px"},
+        estrelas(nota(c)), el("span",{class:"nota"},nota(c).toFixed(1)),
+        el("span",{class:"mini"},media!=null?`(${Banco.avaliacoesDe(c.id).length} na comunidade)`:"(sem avaliações ainda)")))));
+
+  t.append(el("div",{class:"wrap"},
+    el("p",{style:"margin:18px 0 0;font-size:15.5px"},c.sinopse),
+    el("div",{class:"chips",style:"padding:0;margin-top:14px"},
+      ...c.generos.map(g=>el("button",{class:"chip",onclick:()=>ir("resultados",{filtros:{generos:[g]},titulo:g})},g)),
+      ...c.temas.map(x=>el("button",{class:"chip",onclick:()=>ir("resultados",{filtros:{temas:[x]},titulo:x})},x))),
+    el("div",{class:"fita"},el("span",{},"Onde assistir: "+c.plataformas.join(", ")+" (dado de demonstração)")),
+    el("div",{style:"display:flex;gap:10px;margin-top:16px"},
+      el("button",{class:"btn btn-1",onclick:()=>folhaSalvar(c)},"＋ Salvar em uma lista"),
+      el("button",{class:"btn btn-2",style:"width:auto;flex:none;padding:14px 16px",onclick:()=>folhaAvaliar(c)},minha?"★ "+minha.nota:"Avaliar"))));
+
+  // abas
+  const painel=el("div",{class:"wrap"});
+  const abas=el("div",{class:"tabs",style:"margin-left:20px;margin-right:20px"});
+  const definir=(nome,btn)=>{ [...abas.children].forEach(b=>b.classList.remove("on")); btn.classList.add("on");
+    painel.innerHTML=""; (nome==="coment"?painelComentarios:nome==="aval"?painelAvaliacoes:painelParecidos)(painel,c); };
+  [["Comentários","coment"],["Avaliações","aval"],["Parecidos","sim"]].forEach(([rot,nome],i)=>{
+    const b=el("button",{class:i===0?"on":"",onclick:()=>definir(nome,b)},rot); abas.append(b);
+    if(i===0) setTimeout(()=>definir(nome,b),0);
+  });
+  t.append(abas,painel);
+};
+
+function painelComentarios(box,c){ // RF06 — Premium para escrever (§11), leitura livre
+  const u=Sessao.user; const filtro=u.config.filtroPalavroes;
+  const lista=el("div");
+  const desenhar=()=>{
+    lista.innerHTML="";
+    const cs=Banco.comentariosDe(c.id);
+    if(!cs.length){ lista.append(el("div",{class:"vazio",style:"padding:28px 0"},
+      el("h3",{},"Ninguém comentou ainda"),el("p",{},"Seja a primeira pessoa a dizer o que achou."))); return; }
+    cs.forEach(cm=>{
+      const autor=Banco.usuario(cm.usuarioId); const meu=cm.usuarioId===u.id;
+      const curtiu=cm.curtidas.includes(u.id);
+      lista.append(el("div",{class:"coment"},avatar(autor),
+        el("div",{class:"corpo"},
+          el("div",{class:"quem"},autor?.nome||"Usuário",
+            autor?.plano==="premium"?el("span",{class:"selo"},"Premium"):null,
+            el("span",{class:"quando"},desde(cm.criadoEm))),
+          el("p",{},limparTexto(cm.texto,filtro)),
+          el("div",{style:"display:flex;gap:14px;align-items:center"},
+            el("button",{class:"mini",style:curtiu?"color:var(--accent);font-weight:700":"",onclick:()=>{
+              const i=cm.curtidas.indexOf(u.id); i<0?cm.curtidas.push(u.id):cm.curtidas.splice(i,1);
+              Banco.salvar(); desenhar();}},(curtiu?"♥ ":"♡ ")+cm.curtidas.length),
+            meu?el("button",{class:"mini",onclick:()=>{
+              Banco.d.comentarios=Banco.d.comentarios.filter(x=>x.id!==cm.id); Banco.salvar(); desenhar(); avisar("Comentário apagado");
+            }},"apagar"):null))));
+    });
+  };
+  const ta=el("textarea",{placeholder:"O que você achou? Sem spoiler, por favor.",rows:3,style:"width:100%;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-size:15px"});
+  const enviar=el("button",{class:"btn btn-1 btn-sm",style:"margin-top:10px",onclick:()=>{
+    if(!exigirPremium("Comentar")) return;
+    const txt=ta.value.trim(); if(txt.length<3){avisar("Escreva um pouco mais.");return;}
+    Banco.d.comentarios.push({id:uid("cm"),usuarioId:u.id,conteudoId:c.id,texto:txt,criadoEm:agora(),curtidas:[]});
+    Banco.salvar(); Banco.registrar("comentou",{id:c.id}); ta.value=""; desenhar(); avisar("Comentário publicado");
+  }},"Publicar comentário");
+  box.append(el("div",{style:"margin-top:16px"},ta,enviar,
+    ehPremium()?null:el("p",{class:"mini",style:"margin-top:8px"},"Comentar é um recurso do Premium. Ler é livre."),
+    filtro?el("p",{class:"mini",style:"margin-top:6px"},"Filtro de palavrões ativo — dá para desligar nas configurações."):null),lista);
+  desenhar();
+}
+
+function painelAvaliacoes(box,c){ // RF07 — uma por usuário (§12)
+  const u=Sessao.user;
+  const av=Banco.avaliacoesDe(c.id).sort((a,b)=>b.criadoEm.localeCompare(a.criadoEm));
+  const dist=[5,4,3,2,1].map(n=>({n,q:av.filter(a=>a.nota===n).length}));
+  const total=av.length||1;
+  box.append(el("div",{style:"margin-top:18px"},
+    ...dist.map(d=>el("div",{style:"display:flex;align-items:center;gap:10px;margin-bottom:6px"},
+      el("span",{class:"mini",style:"width:26px"},d.n+"★"),
+      el("span",{style:"flex:1;height:7px;border-radius:4px;background:var(--surface-2);overflow:hidden"},
+        el("span",{style:`display:block;height:100%;width:${(d.q/total)*100}%;background:var(--accent)`})),
+      el("span",{class:"mini",style:"width:22px;text-align:right"},d.q)))));
+  box.append(el("button",{class:"btn btn-2",style:"margin-top:16px",onclick:()=>folhaAvaliar(c)},
+    Banco.minhaAvaliacao(u.id,c.id)?"Editar minha avaliação":"Avaliar este título"));
+  const lst=el("div",{style:"margin-top:8px"});
+  av.forEach(a=>{ const autor=Banco.usuario(a.usuarioId);
+    lst.append(el("div",{class:"coment"},avatar(autor),
+      el("div",{class:"corpo"},
+        el("div",{class:"quem"},autor?.nome||"Usuário",el("span",{class:"quando"},desde(a.criadoEm))),
+        el("div",{class:"estrelas",style:"font-size:15px"},"★".repeat(a.nota)+"☆".repeat(5-a.nota)),
+        a.resenha?el("p",{},limparTexto(a.resenha,u.config.filtroPalavroes)):null)));
+  });
+  if(!av.length) lst.append(el("div",{class:"vazio",style:"padding:24px 0"},el("p",{},"Nenhuma avaliação ainda.")));
+  box.append(lst);
+}
+
+function painelParecidos(box,c){
+  const p=Banco.d.catalogo.filter(x=>x.id!==c.id)
+    .map(x=>({x,s:x.temas.filter(t=>c.temas.includes(t)).length*2 + x.generos.filter(g=>c.generos.includes(g)).length}))
+    .filter(o=>o.s>0).sort((a,b)=>b.s-a.s||nota(b.x)-nota(a.x)).slice(0,6);
+  box.append(el("p",{class:"mini",style:"margin:16px 0 10px"},"Mesmos temas e gêneros, na ordem de proximidade."));
+  const g=el("div",{class:"grade"}); p.forEach(o=>g.append(cartaz(o.x))); box.append(g);
+  if(!p.length) box.append(el("p",{class:"sub"},"Nada parecido no catálogo de demonstração."));
+}
+
+function folhaAvaliar(c){ // regra: 1 avaliação por usuário por conteúdo
+  const u=Sessao.user;
+  if(!exigirPremium("Avaliar títulos")) return;
+  const atual=Banco.minhaAvaliacao(u.id,c.id);
+  let n=atual?.nota||0;
+  const est=el("div",{class:"estrelas input"});
+  const pintar=()=>[...est.children].forEach((b,i)=>b.classList.toggle("on",i<n));
+  for(let i=1;i<=5;i++) est.append(el("button",{"aria-label":i+" estrelas",onclick:()=>{n=i;pintar();}},"★"));
+  pintar();
+  const ta=el("textarea",{placeholder:"Resenha (opcional)",rows:3,style:"width:100%;margin-top:14px;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--surface)"},);
+  if(atual) ta.value=atual.resenha||"";
+  const fechar=abrirFolha(c.titulo,
+    el("p",{class:"sub",style:"margin:-8px 0 14px"},atual?"Você já avaliou. Isto substitui a nota anterior.":"Sua nota entra na média da comunidade."),
+    est, ta,
+    el("button",{class:"btn btn-1",style:"margin-top:16px",onclick:()=>{
+      if(!n){avisar("Escolha de 1 a 5 estrelas.");return;}
+      if(atual){ atual.nota=n; atual.resenha=ta.value.trim(); atual.criadoEm=agora(); }
+      else Banco.d.avaliacoes.push({id:uid("a"),usuarioId:u.id,conteudoId:c.id,nota:n,resenha:ta.value.trim(),criadoEm:agora()});
+      Banco.salvar(); Banco.registrar("avaliou",{id:c.id,nota:n}); fechar(); avisar("Avaliação salva"); render();
+    }},atual?"Atualizar avaliação":"Salvar avaliação"),
+    atual?el("button",{class:"btn btn-3",style:"margin-top:6px",onclick:()=>{
+      Banco.d.avaliacoes=Banco.d.avaliacoes.filter(a=>a.id!==atual.id); Banco.salvar(); fechar(); avisar("Avaliação removida"); render();
+    }},"Remover minha avaliação"):null);
+}
+
+function folhaSalvar(c){ // RF08
+  const u=Sessao.user;
+  const corpo=el("div");
+  const desenhar=()=>{
+    corpo.innerHTML="";
+    const minhas=Banco.listasDe(u.id);
+    if(!minhas.length) corpo.append(el("p",{class:"sub",style:"margin-bottom:12px"},"Você ainda não tem listas. Crie a primeira abaixo."));
+    minhas.forEach(l=>{
+      const item=Banco.d.itensLista.find(i=>i.listaId===l.id&&i.conteudoId===c.id);
+      corpo.append(el("button",{class:"opt",onclick:()=>{
+        if(item){ Banco.d.itensLista=Banco.d.itensLista.filter(i=>i.id!==item.id); avisar("Removido de "+l.nome); }
+        else { Banco.d.itensLista.push({id:uid("il"),listaId:l.id,conteudoId:c.id,addEm:agora()}); Banco.registrar("add_lista",{id:c.id}); avisar("Salvo em "+l.nome); }
+        Banco.salvar(); desenhar();
+      }}, el("span",{class:"t"},el("strong",{},l.nome),el("span",{},`${Banco.itensDe(l.id).length} títulos · ${l.publica?"pública":"privada"}`)),
+         el("span",{style:`font-size:20px;color:${item?"var(--accent)":"var(--text-2)"}`},item?"✓":"＋")));
+    });
+  };
+  desenhar();
+  abrirFolha("Salvar em uma lista", corpo,
+    el("button",{class:"btn btn-2",style:"margin-top:16px",onclick:()=>{ folhaNovaLista(()=>desenhar()); }},"Criar nova lista"));
+}
+
+function folhaNovaLista(depois){
+  const u=Sessao.user;
+  const nome=el("input",{placeholder:"Nome da lista",style:"width:100%;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--surface)"});
+  const desc=el("input",{placeholder:"Descrição curta (opcional)",style:"width:100%;margin-top:10px;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--surface)"});
+  let publica=false;
+  const sw=el("span",{class:"switch"},el("i"));
+  const linhaPub=el("button",{class:"opt",onclick:()=>{
+    if(!publica && !ehPremium()){ avisar("Listas públicas são do Premium. Ative no seu perfil."); return; }
+    publica=!publica; sw.classList.toggle("on",publica);
+  }}, el("span",{class:"t"},el("strong",{},"Lista pública"),el("span",{},"Aparece para a comunidade. Recurso Premium.")), sw);
+  const fechar=abrirFolha("Nova lista", nome, desc, linhaPub,
+    el("button",{class:"btn btn-1",style:"margin-top:14px",onclick:()=>{
+      const t=nome.value.trim(); if(t.length<2){avisar("Dê um nome à lista.");return;}
+      Banco.d.listas.push({id:uid("l"),usuarioId:u.id,nome:t,descricao:desc.value.trim(),publica,criadoEm:agora()});
+      Banco.salvar(); Banco.registrar("criou_lista"); fechar(); avisar("Lista criada"); depois?depois():render();
+    }},"Criar lista"));
+  setTimeout(()=>nome.focus(),60);
+}
+
+/* ============================================================
+   10. LISTAS
+   ============================================================ */
+TELAS.listas=(t,p)=>{
+  const u=Sessao.user; let aba=p.aba||"minhas";
+  t.append(cabecalho("Listas", el("button",{class:"iconbtn","aria-label":"Nova lista",onclick:()=>folhaNovaLista()},"＋")));
+  const abas=el("div",{class:"tabs",style:"margin:14px 20px 0"});
+  const painel=el("div",{class:"wrap",style:"margin-top:8px"});
+  const desenhar=()=>{
+    painel.innerHTML="";
+    if(aba==="minhas"){
+      const ls=Banco.listasDe(u.id);
+      if(!ls.length){ painel.append(el("div",{class:"vazio"},
+        el("h3",{},"Nenhuma lista ainda"),
+        el("p",{},"Listas guardam o que você quer ver depois — e as públicas viram recomendação para os outros."),
+        el("button",{class:"btn btn-1",style:"margin-top:16px",onclick:()=>folhaNovaLista(desenhar)},"Criar primeira lista"))); return; }
+      ls.forEach(l=>painel.append(cardLista(l)));
+    } else {
+      const ls=Banco.listasPublicas().filter(l=>l.usuarioId!==u.id);
+      if(!ls.length) painel.append(el("div",{class:"vazio"},el("h3",{},"Sem listas públicas por aqui"),el("p",{},"Publique a sua e comece a conversa.")));
+      ls.forEach(l=>painel.append(cardLista(l)));
+    }
+  };
+  [["Minhas","minhas"],["Comunidade","comunidade"]].forEach(([rot,k])=>{
+    const b=el("button",{class:aba===k?"on":"",onclick:()=>{aba=k;[...abas.children].forEach(x=>x.classList.remove("on"));b.classList.add("on");desenhar();}},rot);
+    abas.append(b);
+  });
+  t.append(abas,painel); desenhar();
+};
+
+TELAS.lista=(t,p)=>{
+  const l=Banco.d.listas.find(x=>x.id===p.id); if(!l){ir("listas");return;}
+  const u=Sessao.user; const meu=l.usuarioId===u.id; const dono=Banco.usuario(l.usuarioId);
+  if(!l.publica && !meu){ ir("listas"); avisar("Essa lista é privada."); return; }
+  const itens=Banco.itensDe(l.id).map(i=>({i,c:Banco.conteudo(i.conteudoId)})).filter(o=>o.c);
+  t.append(voltar(voltarRota),el("div",{class:"wrap"},
+    el("h1",{},l.nome),
+    l.descricao?el("p",{class:"sub"},l.descricao):null,
+    el("p",{class:"sub"},`${itens.length} ${itens.length===1?"título":"títulos"} · ${l.publica?"pública":"privada"} · por ${dono?.nome||"—"}`),
+    meu?el("div",{style:"display:flex;gap:10px;margin-top:14px"},
+      el("button",{class:"btn btn-2 btn-sm",onclick:()=>{
+        if(!l.publica && !exigirPremium("Publicar listas")) return;
+        l.publica=!l.publica; Banco.salvar(); avisar(l.publica?"Lista publicada":"Lista agora é privada"); render();
+      }},l.publica?"Tornar privada":"Publicar lista"),
+      el("button",{class:"btn btn-3 btn-sm",onclick:()=>{
+        Banco.d.listas=Banco.d.listas.filter(x=>x.id!==l.id);
+        Banco.d.itensLista=Banco.d.itensLista.filter(i=>i.listaId!==l.id);
+        Banco.salvar(); avisar("Lista apagada"); ir("listas");
+      }},"Apagar")):null));
+  const box=el("div",{class:"wrap",style:"margin-top:16px"});
+  if(!itens.length) box.append(el("div",{class:"vazio"},el("h3",{},"Lista vazia"),el("p",{},"Abra um título e use “Salvar em uma lista”.")));
+  itens.forEach(({i,c})=>{
+    box.append(el("div",{class:"card",style:"margin-bottom:10px;display:flex;gap:12px;align-items:center"},
+      linhaConteudo(c),
+      meu?el("button",{class:"mini",style:"flex:none",onclick:()=>{
+        Banco.d.itensLista=Banco.d.itensLista.filter(x=>x.id!==i.id); Banco.salvar(); render(); avisar("Removido");
+      }},"✕"):null));
+  });
+  t.append(box);
+};
+
+/* ============================================================
+   11. PERFIL E CONFIGURAÇÕES
+   ============================================================ */
+TELAS.perfil=t=>{
+  const u=Sessao.user;
+  const minhasAv=Banco.d.avaliacoes.filter(a=>a.usuarioId===u.id);
+  const meusCm=Banco.d.comentarios.filter(c=>c.usuarioId===u.id);
+  const minhasL=Banco.listasDe(u.id);
+  t.append(cabecalho("Perfil", el("button",{class:"iconbtn","aria-label":"Configurações",onclick:()=>ir("config")},"⚙")));
+  t.append(el("div",{class:"wrap",style:"display:flex;gap:14px;align-items:center;margin-top:8px"},
+    avatar(u,64),
+    el("div",{style:"flex:1;min-width:0"},
+      el("h2",{},u.nome),
+      el("p",{class:"sub"},u.email),
+      el("p",{style:"margin-top:6px"},u.plano==="premium"?el("span",{class:"selo"},"Premium"):el("span",{class:"mini"},"Plano gratuito")))));
+  if(u.bio) t.append(el("div",{class:"wrap"},el("p",{style:"margin-top:14px"},u.bio)));
+
+  t.append(el("div",{class:"wrap",style:"margin-top:18px"},
+    el("div",{style:"display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center"},
+      ...[[minhasAv.length,"avaliações"],[minhasL.length,"listas"],[meusCm.length,"comentários"]]
+        .map(([n,r])=>el("div",{class:"card"},el("div",{class:"nota",style:"font-size:22px"},n),el("div",{class:"mini"},r))))));
+
+  if(u.plano!=="premium") t.append(el("div",{class:"wrap"},
+    el("div",{class:"card",style:"margin-top:16px;border-color:var(--accent)"},
+      el("h3",{},"Assine o Premium"),
+      el("p",{class:"mini",style:"margin:6px 0 12px"},"Avaliar, comentar, publicar listas e personalizar o perfil."),
+      el("button",{class:"btn btn-1 btn-sm",onclick:()=>exigirPremium("Este recurso")},"Ver o que muda"))));
+
+  if(minhasAv.length){
+    t.append(el("div",{class:"secao wrap"},el("h2",{},"O que você avaliou")));
+    const box=el("div",{class:"wrap"});
+    minhasAv.slice().reverse().forEach(a=>{const c=Banco.conteudo(a.conteudoId); if(c)
+      box.append(el("div",{class:"card",style:"margin-bottom:10px"},linhaConteudo(c,"sua nota: "+"★".repeat(a.nota))));});
+    t.append(box);
+  }
+  if(minhasL.length){
+    t.append(el("div",{class:"secao wrap"},el("h2",{},"Suas listas"),el("button",{onclick:()=>ir("listas")},"ver tudo")));
+    const box=el("div",{class:"wrap"}); minhasL.slice(0,3).forEach(l=>box.append(cardLista(l))); t.append(box);
+  }
+  t.append(el("div",{class:"wrap"},
+    el("button",{class:"btn btn-2",style:"margin-top:22px",onclick:()=>ir("metricas")},"Métricas do produto"),
+    el("button",{class:"btn btn-3",style:"margin-top:8px",onclick:()=>{Sessao.fechar();ir("abertura");avisar("Você saiu.");}},"Sair da conta")));
+};
+
+TELAS.config=t=>{
+  const u=Sessao.user; const cfg=u.config;
+  const troca=(rot,desc,chave,onOff)=>{
+    const sw=el("span",{class:"switch"+(cfg[chave]?" on":"")},el("i"));
+    return el("button",{class:"opt",onclick:()=>{cfg[chave]=!cfg[chave];sw.classList.toggle("on",cfg[chave]);Banco.salvar();onOff&&onOff();}},
+      el("span",{class:"t"},el("strong",{},rot),el("span",{},desc)),sw);
+  };
+  t.append(voltar(voltarRota),el("div",{class:"wrap"},
+    el("h1",{},"Configurações"),
+    el("div",{class:"secao"},el("h2",{},"Conta")),
+    el("div",{class:"campo"},el("label",{for:"nome"},"Nome"),
+      el("input",{id:"nome",value:u.nome,onchange:e=>{u.nome=e.target.value.trim()||u.nome;Banco.salvar();avisar("Nome atualizado");}})),
+    el("div",{class:"campo"},el("label",{for:"bio"},"Bio"),
+      el("input",{id:"bio",value:u.bio,placeholder:"Uma linha sobre o seu gosto",onchange:e=>{
+        if(!ehPremium()){exigirPremium("Perfil personalizado");e.target.value=u.bio;return;}
+        u.bio=e.target.value.trim();Banco.salvar();avisar("Bio atualizada");}})),
+
+    el("div",{class:"secao"},el("h2",{},"Conteúdo")),
+    troca("Filtro de palavrões","Oculta palavras ofensivas em comentários e resenhas.","filtroPalavroes"),
+    el("button",{class:"opt",onclick:()=>ir("onboarding")},
+      el("span",{class:"t"},el("strong",{},"Gêneros favoritos"),el("span",{},u.generosFav.length?u.generosFav.join(", "):"Nenhum escolhido")),el("span",{},"›")),
+
+    el("div",{class:"secao"},el("h2",{},"Aparência")),
+    el("div",{style:"display:flex;gap:8px;margin-bottom:8px"},
+      ...[["sistema","Sistema"],["light","Matinê"],["dark","Sessão noturna"]].map(([k,r])=>
+        el("button",{class:"chip"+(cfg.tema===k?" on":""),onclick:e=>{
+          cfg.tema=k;Banco.salvar();aplicarTema();
+          [...e.currentTarget.parentNode.children].forEach(b=>b.classList.remove("on"));e.currentTarget.classList.add("on");}},r))),
+
+    el("div",{class:"secao"},el("h2",{},"Plano")),
+    el("div",{class:"card"},
+      el("strong",{},u.plano==="premium"?"Premium ativo":"Plano gratuito"),
+      el("p",{class:"mini",style:"margin:6px 0 12px"},u.plano==="premium"
+        ?"Você pode avaliar, comentar, publicar listas e personalizar o perfil."
+        :"Catálogo, busca por IA, listas privadas e leitura da comunidade."),
+      u.plano==="premium"
+        ? el("button",{class:"btn btn-2 btn-sm",onclick:()=>{u.plano="free";Banco.salvar();avisar("Voltou para o gratuito");render();}},"Voltar ao gratuito")
+        : el("button",{class:"btn btn-1 btn-sm",onclick:()=>exigirPremium("Este recurso")},"Assinar Premium")),
+
+    el("div",{class:"secao"},el("h2",{},"Dados")),
+    el("button",{class:"btn btn-2",onclick:()=>{
+      const blob=new Blob([JSON.stringify(Banco.d,null,2)],{type:"application/json"});
+      baixar(blob,"eunis-banco.json");}},"Exportar meu banco (JSON)"),
+    el("button",{class:"btn btn-3",style:"margin-top:8px;color:var(--alerta)",onclick:()=>{
+      abrirFolha("Apagar tudo?", el("p",{class:"sub"},"Isso remove contas, listas, avaliações e comentários deste navegador. Não dá para desfazer."),
+        el("button",{class:"btn btn-1",style:"margin-top:16px;background:var(--alerta);color:#fff",onclick:async()=>{
+          Banco.zerar(); await semearComunidade(); Sessao.uid=null; $("#folha").innerHTML=""; ir("abertura"); avisar("Banco reiniciado");
+        }},"Apagar e recomeçar"));
+    }},"Apagar todos os dados"),
+    el("p",{class:"mini",style:"margin-top:20px"},"EUNIS MVP 1.0 · protótipo navegável do PRD. Dados ficam apenas neste navegador.")));
+};
+
+async function baixar(blob,nome){
+  try{
+    const d = window.claude?.use ? await window.claude.use("downloads") : null;
+    if(d){ await d.save({filename:nome,data:await blob.text()}); return; }
+  }catch(e){}
+  const url=URL.createObjectURL(blob); const a=document.createElement("a");
+  a.href=url; a.download=nome; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+TELAS.metricas=t=>{ // §19
+  const ev=Banco.d.eventos; const conta=k=>ev.filter(e=>e.tipo===k).length;
+  const linhas=[["Cadastros",conta("cadastro")],["Logins",conta("login")],["Buscas por IA",conta("busca_ia")],
+    ["Buscas por filtros",conta("busca_filtros")],["Títulos abertos",conta("abriu_conteudo")],
+    ["Avaliações",Banco.d.avaliacoes.length],["Comentários",Banco.d.comentarios.length],
+    ["Listas criadas",Banco.d.listas.length],["Itens salvos em listas",Banco.d.itensLista.length],
+    ["Conversões para Premium",conta("premium_ativado")]];
+  t.append(voltar(voltarRota),el("div",{class:"wrap"},
+    el("h1",{},"Métricas"),
+    el("p",{class:"sub",style:"margin-bottom:18px"},"Os indicadores do §19 do PRD, medidos nesta sessão. Em produção iriam para o backend."),
+    ...linhas.map(([r,n])=>el("div",{class:"opt"},el("span",{class:"t"},el("strong",{},r)),el("span",{class:"nota"},n))),
+    el("div",{class:"fita"},"Retenção semanal e tempo de sessão dependem de telemetria no servidor — ficaram fora do protótipo.")));
+};
+
+/* ============================================================
+   12. TEMA + BOOT
+   ============================================================ */
+function aplicarTema(){
+  const tema=Sessao.user?.config?.tema||"sistema";
+  if(tema==="sistema") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme",tema);
+}
+
+(async function boot(){
+  Banco.iniciar();
+  await semearComunidade();
+  Sessao.carregar();
+  aplicarTema();
+  if(Sessao.uid){ const u=Sessao.user; rota={nome:u.generosFav.length?"inicio":"onboarding",p:{}}; }
+  else rota={nome:"abertura",p:{}};
+  render();
+})();
+</script>
+</body>
+</html>
