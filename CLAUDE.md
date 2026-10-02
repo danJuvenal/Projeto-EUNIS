@@ -253,23 +253,29 @@ Estrutura inicial desejada:
 Aplicativo_filmes/
 │
 ├── frontend/
+│   └── tests/        ← testes do frontend
 │
 ├── backend/
+│   └── tests/        ← testes do backend
 │
 ├── database/
 │
-├── tests/
-│
 ├── docs/
+│   └── legacy/       ← definições .d.ts do runtime de Artifacts (referência)
 │
 ├── scripts/
 │
-├── .env
+├── legacy/           ← MVP original (eunis.html), sem alterações
+│
+├── .env              ← local, nunca commitado
 ├── .env.example
+├── .gitattributes
 ├── .gitignore
 ├── README.md
 └── CLAUDE.md
 ```
+
+**Testes:** ficam separados por projeto, em `backend/tests/` e `frontend/tests/`. Não utilizar uma pasta `tests/` na raiz como estrutura principal (decisão D-003 em `docs/decisoes.md`).
 
 A estrutura interna de cada pasta deve ser definida durante a implementação.
 
@@ -1181,7 +1187,7 @@ Para considerar uma fase concluída:
 
 # 37. ROADMAP DETALHADO
 
-## FASE 0 — Análise
+## FASE 0 — Análise ✅ CONCLUÍDA (2026-10-02)
 
 Objetivo:
 
@@ -1189,26 +1195,29 @@ Entender completamente o MVP atual.
 
 Tarefas:
 
-- [ ] analisar eunis.html
-- [ ] mapear telas
-- [ ] mapear funcionalidades
-- [ ] mapear dados
-- [ ] mapear dependências
-- [ ] identificar código legado
-- [ ] documentar arquitetura atual
+- [x] analisar eunis.html
+- [x] mapear telas
+- [x] mapear funcionalidades
+- [x] mapear dados
+- [x] mapear dependências
+- [x] identificar código legado
+- [x] documentar arquitetura atual
+
+Resultado: `docs/analise-fase0.md`.
 
 ---
 
-## FASE 1 — Estrutura
+## FASE 1 — Estrutura ✅ CONCLUÍDA (2026-10-02)
 
-- [ ] criar frontend
-- [ ] criar backend
-- [ ] criar database
-- [ ] criar tests
-- [ ] criar docs
-- [ ] configurar Git
-- [ ] configurar .gitignore
-- [ ] criar .env.example
+- [x] criar frontend
+- [x] criar backend
+- [x] criar database
+- [x] criar tests (em `backend/tests/` e `frontend/tests/`)
+- [x] criar docs
+- [x] configurar Git
+- [x] configurar .gitignore
+- [x] criar .env.example
+- [x] preservar MVP em `legacy/` e `.d.ts` em `docs/legacy/`
 
 ---
 
@@ -1578,50 +1587,84 @@ Não afirmar que algo funciona sem testar.
 
 ## FASE 0 — ANÁLISE DO PROJETO
 
-Pode iniciar a Fase 1.
+Pode prosseguir com a conclusão da Fase 1 e depois iniciar a Fase 2.
 
-Decisões:
+Antes de iniciar a Fase 2:
 
-1. Os arquivos .d.ts devem ser mantidos como referência e movidos para:
-   docs/legacy/
+1. Atualize a CLAUDE.md para refletir corretamente a decisão já tomada:
+   - os testes ficarão separados em:
+     backend/tests/
+     frontend/tests/
+   - não utilizar uma pasta tests/ na raiz como estrutura principal.
 
-   Não apagar os arquivos.
+2. Atualize os checkboxes/status da CLAUDE.md para registrar que a Fase 0 e a Fase 1 foram concluídas.
 
-2. Sim, as regras atuais do Premium continuam válidas como requisito:
-   - Avaliar títulos
-   - Comentar
-   - Publicar listas
-   - Editar/personalizar a bio do perfil
+3. Conclua o snapshot da Fase 1 no Git.
+   Se o classificador de permissões bloquear o commit, não tente contornar a proteção. Apenas informe que o commit ficou pendente e continue somente se isso não impedir tecnicamente a Fase 2.
 
-   Não implementar pagamento real ainda. Apenas preservar essas regras de negócio para a arquitetura futura.
+Depois disso, INICIE A FASE 2.
 
-3. Os testes devem ficar separados por projeto:
-   - backend/tests/
-   - frontend/tests/
+FASE 2 — STACK E AMBIENTE
 
-Agora pode executar a Fase 1 conforme definido na CLAUDE.md.
+Objetivo:
+Configurar o ambiente técnico real do projeto, mas ainda sem implementar funcionalidades de negócio.
 
-Antes de qualquer alteração destrutiva, faça uma verificação do estado atual e preserve o MVP original como referência em legacy/.
+Backend:
+- Python 3.12
+- FastAPI
+- ambiente virtual
+- gerenciador de dependências
+- pytest
 
-Depois:
-- inicialize o Git;
-- crie o .gitignore;
-- crie o .env.example;
-- crie a estrutura inicial de pastas;
-- mova os arquivos .d.ts para docs/legacy/;
-- mova eunis.html para legacy/ sem modificar seu conteúdo;
-- crie os arquivos iniciais necessários para a nova estrutura;
-- não implemente ainda backend, banco, autenticação, TMDb ou IA.
+Frontend:
+- React
+- Vite
+- TypeScript
+- Vitest
+- Testing Library
 
-Ao terminar, mostre:
-1. estrutura criada;
-2. arquivos movidos;
-3. arquivos novos;
-4. comandos executados;
-5. qualquer problema encontrado;
-6. próximo passo recomendado.
+Banco:
+- PostgreSQL
+- decidir entre Docker Compose ou instalação local
+- documentar a decisão
 
-Não avance para a Fase 2 sem minha autorização.
+Também configurar:
+- estrutura inicial do backend
+- estrutura inicial do frontend
+- configuração básica do FastAPI
+- configuração básica do React/Vite
+- configuração inicial do pytest
+- configuração inicial do Vitest
+- arquivos de configuração necessários
+
+IMPORTANTE:
+
+Ainda NÃO implementar:
+- autenticação
+- banco de dados/migrations
+- TMDb
+- IA
+- Premium
+- avaliações
+- comentários
+- listas
+
+A Fase 2 é somente preparação do ambiente e da stack.
+
+Antes de instalar ou criar dependências desnecessárias, verificar o que já existe no sistema.
+
+Ao terminar, informe:
+1. versões utilizadas;
+2. dependências instaladas;
+3. estrutura criada;
+4. decisão sobre PostgreSQL;
+5. comandos para executar frontend;
+6. comandos para executar backend;
+7. comandos para executar testes;
+8. problemas encontrados;
+9. próximo passo.
+
+Não avance para a Fase 3 sem minha autorização.
 
 ### IMPORTANTE
 
