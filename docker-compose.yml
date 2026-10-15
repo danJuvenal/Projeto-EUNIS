@@ -1,0 +1,30 @@
+# PostgreSQL para desenvolvimento local (decisão D-008 em docs/decisoes.md).
+# Usado a partir da Fase 3. Requer Docker Desktop.
+#
+#   docker compose up -d db      # sobe o banco
+#   docker compose down          # para (os dados ficam no volume)
+#   docker compose down -v       # para e APAGA os dados
+#
+# Credenciais vêm do .env na raiz (veja .env.example).
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: eunis-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-eunis}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      POSTGRES_DB: ${POSTGRES_DB:-eunis}
+    ports:
+      # Exposto só para a própria máquina
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

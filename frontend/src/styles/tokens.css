@@ -1,0 +1,82 @@
+/* ============================================================
+   EUNIS — tokens · conceito "Sala escura"
+   Escuro quente, luz de projetor, pôsteres como única fonte de cor.
+   Ver EUNIS_REDESIGN_PLAN.md §B.
+   ============================================================ */
+:root {
+  color-scheme: dark;
+
+  /* Superfícies */
+  --ink-0: #09080b;
+  --ink-1: #111014;
+  --ink-2: #18161c;
+  --ink-3: #221f27;
+  --ink-4: #2c2832;
+  --line: rgba(244, 240, 232, 0.08);
+  --line-2: rgba(244, 240, 232, 0.14);
+
+  /* Texto */
+  --paper: #f4f0e8;
+  --paper-2: #a9a3ae;
+  --paper-3: #6e6875;
+
+  /* Acentos */
+  --iris: #8c6cff;
+  --iris-hi: #b7a3ff;
+  --iris-lo: rgba(140, 108, 255, 0.16);
+  --lamp: #ffb648;
+  --lamp-lo: rgba(255, 182, 72, 0.14);
+  --live: #3ddc97;
+  --danger: #ff6b6b;
+
+  /* Tipografia */
+  --ff-display: 'Bricolage Grotesque Variable', 'Arial Narrow', system-ui, sans-serif;
+  --ff-body: 'Inter Tight Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ff-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+
+  --t-xs: 0.75rem;
+  --t-sm: 0.875rem;
+  --t-md: 1rem;
+  --t-lg: 1.125rem;
+  --t-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.375rem);
+  --t-2xl: clamp(1.5rem, 1.2rem + 1.2vw, 1.75rem);
+  --t-3xl: clamp(2rem, 1.5rem + 2vw, 2.5rem);
+  --t-4xl: clamp(2.5rem, 1.6rem + 4vw, 4rem);
+  --t-hero: clamp(3rem, 1.4rem + 7.4vw, 7rem);
+
+  /* Espaçamento (grade de 4px) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+  --gutter: clamp(16px, 4vw, 48px);
+  --maxw: 1280px;
+
+  /* Raios */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-poster: 10px;
+  --r-pill: 999px;
+
+  /* Luz (elevação) */
+  --glow-top: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.5), 0 24px 60px rgba(0, 0, 0, 0.55);
+
+  /* Movimento */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-1: 140ms;
+  --dur-2: 240ms;
+  --dur-3: 420ms;
+
+  --nav-h: 64px;
+  --tab-h: 64px;
+}

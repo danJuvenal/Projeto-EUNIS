@@ -1,0 +1,28 @@
+[project]
+name = "eunis-backend"
+version = "0.1.0"
+description = "API do EUNIS — descoberta de filmes e séries por intenção"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic-settings>=2.4",
+    "sqlalchemy>=2.1.4",
+    "alembic>=1.20.0",
+    "psycopg[binary]>=3.3.6",
+    "httpx2>=2.13.1",
+]
+
+[dependency-groups]
+dev = [
+    "httpx2>=2.13.1",
+    "pytest>=8.3",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"

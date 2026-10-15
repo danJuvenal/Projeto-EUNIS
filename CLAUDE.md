@@ -1221,13 +1221,13 @@ Resultado: `docs/analise-fase0.md`.
 
 ---
 
-## FASE 2 — Stack
+## FASE 2 — Stack 🟡 AGUARDANDO REVISÃO (2026-10-02)
 
-- [ ] definir framework frontend
-- [ ] configurar backend
-- [ ] configurar PostgreSQL
-- [ ] configurar ambiente local
-- [ ] documentar decisões
+- [x] definir framework frontend (React + Vite + TypeScript, Vitest + Testing Library)
+- [x] configurar backend (Python 3.12 + FastAPI, uv, pytest)
+- [~] configurar PostgreSQL (`docker-compose.yml` criado; Docker Desktop ainda não instalado, não executado)
+- [x] configurar ambiente local
+- [x] documentar decisões (D-006 a D-008 em `docs/decisoes.md`)
 
 ---
 
@@ -1585,94 +1585,30 @@ Não afirmar que algo funciona sem testar.
 
 # 43. TAREFA ATUAL
 
-## FASE 0 — ANÁLISE DO PROJETO
+## REBOOT DO EUNIS (2026-10-15) — implementado, aguardando revisão
 
-Pode prosseguir com a conclusão da Fase 1 e depois iniciar a Fase 2.
+O dono do produto autorizou um "reboot": redesign completo, landing page cinematográfica e
+funcionalidades sociais reais. Isso entregou, de uma vez, partes das Fases 3, 4, 5, 6, 7, 8, 10–15:
 
-Antes de iniciar a Fase 2:
+- Banco (SQLAlchemy + Alembic; SQLite local, PostgreSQL via `DATABASE_URL`) — D-009
+- Auth real (scrypt + cookie HttpOnly) — D-013
+- Catálogo TMDb com fallback demo — D-010
+- Críticas (CRUD, curtidas, comentários), biblioteca, listas, seguir, feed, perfis
+- Presença online em tempo real (WebSocket) — D-012
+- Match cinematográfico e compatibilidade entre usuários
+- Nova identidade visual + GSAP — D-015
 
-1. Atualize a CLAUDE.md para refletir corretamente a decisão já tomada:
-   - os testes ficarão separados em:
-     backend/tests/
-     frontend/tests/
-   - não utilizar uma pasta tests/ na raiz como estrutura principal.
+Documentos: `EUNIS_REDESIGN_PLAN.md` (plano e direção visual) e `docs/decisoes.md` (D-009 a D-015).
 
-2. Atualize os checkboxes/status da CLAUDE.md para registrar que a Fase 0 e a Fase 1 foram concluídas.
+### Pendências conhecidas
 
-3. Conclua o snapshot da Fase 1 no Git.
-   Se o classificador de permissões bloquear o commit, não tente contornar a proteção. Apenas informe que o commit ficou pendente e continue somente se isso não impedir tecnicamente a Fase 2.
+- D-011: confirmar se as regras Premium (D-002) valem no lançamento (`PREMIUM_ENFORCEMENT`).
+- Instalar Docker e validar com PostgreSQL (D-008).
+- Configurar `TMDB_API_KEY` e validar o modo TMDb com a API real (testado só com HTTP simulado).
+- Fora do escopo do reboot: busca por IA (Fase 9), recuperação de senha por e-mail, pagamentos,
+  moderação/denúncias, analytics (Fase 16), presença multi-instância.
 
-Depois disso, INICIE A FASE 2.
-
-FASE 2 — STACK E AMBIENTE
-
-Objetivo:
-Configurar o ambiente técnico real do projeto, mas ainda sem implementar funcionalidades de negócio.
-
-Backend:
-- Python 3.12
-- FastAPI
-- ambiente virtual
-- gerenciador de dependências
-- pytest
-
-Frontend:
-- React
-- Vite
-- TypeScript
-- Vitest
-- Testing Library
-
-Banco:
-- PostgreSQL
-- decidir entre Docker Compose ou instalação local
-- documentar a decisão
-
-Também configurar:
-- estrutura inicial do backend
-- estrutura inicial do frontend
-- configuração básica do FastAPI
-- configuração básica do React/Vite
-- configuração inicial do pytest
-- configuração inicial do Vitest
-- arquivos de configuração necessários
-
-IMPORTANTE:
-
-Ainda NÃO implementar:
-- autenticação
-- banco de dados/migrations
-- TMDb
-- IA
-- Premium
-- avaliações
-- comentários
-- listas
-
-A Fase 2 é somente preparação do ambiente e da stack.
-
-Antes de instalar ou criar dependências desnecessárias, verificar o que já existe no sistema.
-
-Ao terminar, informe:
-1. versões utilizadas;
-2. dependências instaladas;
-3. estrutura criada;
-4. decisão sobre PostgreSQL;
-5. comandos para executar frontend;
-6. comandos para executar backend;
-7. comandos para executar testes;
-8. problemas encontrados;
-9. próximo passo.
-
-Não avance para a Fase 3 sem minha autorização.
-
-### IMPORTANTE
-
-**Não começar a migração automaticamente nesta tarefa.**
-
-Primeiro apresentar a análise.
-
-Depois da análise, aguardar a próxima instrução.
+Próximas tarefas devem voltar ao formato incremental desta CLAUDE.md (§41).
 
 ---
 
